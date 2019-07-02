@@ -25,7 +25,7 @@ public class AccountDaoImpl implements AccountDao{
     @Override
     public List<Account> getAllAccounts() {
         try{
-            return entityManager.createQuery("FROM accounts")
+            return entityManager.createQuery("FROM Account",Account.class)
                     .getResultList();
         }
         catch (Exception e)
@@ -38,7 +38,7 @@ public class AccountDaoImpl implements AccountDao{
     @Override
     public Account getBalanceByNumberOfAccount(String accountNum) {
         try {
-            return entityManager.createQuery("FROM accounts WHERE numberAccount =: accountNum", Account.class)
+            return entityManager.createQuery("FROM Account WHERE numberAccount =: accountNum", Account.class)
                     .getSingleResult();
         }
         catch (Exception e)

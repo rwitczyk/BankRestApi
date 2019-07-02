@@ -13,7 +13,7 @@ import java.util.List;
 @CrossOrigin
 @RestController
 @RequestMapping("/api")
-public class AccountController {
+public class AccountEndpoint {
 
     @Autowired
     private AccountDao accountDao;
