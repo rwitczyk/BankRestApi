@@ -1,14 +1,13 @@
 package com.restApi.RestApi.Entities;
 
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @Table(name = "accounts")
 public class Account {
@@ -29,13 +28,5 @@ public class Account {
     private String name;
 
     @Column(name = "balance")
-    private String balance;
-
-
-    public Account(String numberAccount, String currency, String name, String balance) {
-        this.numberAccount = numberAccount;
-        this.currency = currency;
-        this.name = name;
-        this.balance = balance;
-    }
+    private BigDecimal balance;
 }
