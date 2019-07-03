@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import java.math.BigDecimal;
 
 @Entity
@@ -18,6 +19,7 @@ public class Transfer {
     private int id;
     private String fromNumberAccount;
     private String toNumberAccount;
+    @Min(0)
     private BigDecimal balance;
     private String currency;
 }

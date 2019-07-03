@@ -26,8 +26,19 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account getAccountByNumberAccount(String numberAccount) {
-        Account account = accountDao.getBalanceByNumberOfAccount(numberAccount);
+        Account account = accountDao.getAccountByNumberOfAccount(numberAccount);
 
         return account;
+    }
+
+    @Override
+    public Account changeNameAccountByIdAccount(int accountId, Account account) {
+        Account accountToChange = accountDaoWithCRUD.getAccountsById(accountId);
+        
+        accountToChange.setName(account.getName());
+        
+        accountDaoWithCRUD.save(accountToChange);
+        
+        return accountToChange;
     }
 }

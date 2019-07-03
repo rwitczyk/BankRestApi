@@ -21,7 +21,7 @@ public class TransferEndpoint {
         this.transferService = transferService;
     }
 
-    @GetMapping("/transfer/new")
+    @PostMapping("/transfer/new")
     public ResponseEntity<Transfer> newTransfer(@RequestBody Transfer transferData)
     {
         Transfer transfer = transferService.saveNewTransfer(transferData);
@@ -31,7 +31,7 @@ public class TransferEndpoint {
         }
         else
         {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 

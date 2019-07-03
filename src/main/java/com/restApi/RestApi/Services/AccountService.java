@@ -7,4 +7,6 @@ public interface AccountService {
     Account getAccountByIdAccount(int accountId);
 
     Account getAccountByNumberAccount(String numberAccount);
+
+    Account changeNameAccountByIdAccount(int accountId,Account account);
 }

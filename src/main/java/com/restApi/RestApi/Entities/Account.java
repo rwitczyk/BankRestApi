@@ -4,6 +4,7 @@ package com.restApi.RestApi.Entities;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import java.math.BigDecimal;
 
 @Entity
@@ -28,5 +29,6 @@ public class Account {
     private String name;
 
     @Column(name = "balance")
+    @Min(0)
     private BigDecimal balance;
 }

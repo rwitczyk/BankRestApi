@@ -8,9 +8,7 @@ public interface AccountDao {
 
     void addAccount(Account account);
 
-    void editAccount(Account account);
-
     List<Account> getAllAccounts();
 
-    Account getBalanceByNumberOfAccount(String accountNumber);
+    Account getAccountByNumberOfAccount(String accountNumber);
 }

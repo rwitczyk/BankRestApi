@@ -32,9 +32,15 @@ public class AccountEndpoint {
     }
 
     @GetMapping("accounts/number/{numberAccount}")
-    public Account getBalanceByNumberAccount(@PathVariable String numberAccount)
+    public ResponseEntity<Account> getAccountByNumberAccount(@PathVariable String numberAccount)
     {
-        return accountDao.getBalanceByNumberOfAccount(numberAccount);
+        Account account = accountService.getAccountByNumberAccount(numberAccount);
+        if(account != null) {
+            return new ResponseEntity<>(account, HttpStatus.OK);
+        }
+        else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping("accounts/id/{idAccount}")
@@ -55,9 +61,16 @@ public class AccountEndpoint {
         accountDao.addAccount(account);
     }
 
-    @PostMapping("accounts/edit")
-    public void editAccount(@RequestBody Account account)
+    @PostMapping("accounts/edit/name/{idAccount}")
+    public ResponseEntity<Account> editNameAccount(@RequestBody Account accountData,@PathVariable int idAccount)
     {
-        accountDao.editAccount(account);
+       Account account = accountService.changeNameAccountByIdAccount(idAccount,accountData);
+
+        if(account != null) {
+            return new ResponseEntity<>(account, HttpStatus.OK);
+        }
+        else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }

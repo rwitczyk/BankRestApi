@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -27,11 +28,18 @@ public class TransferServiceImpl implements TransferService {
         Account accountFrom = accountDaoWithCRUD.getAccountByNumberAccount(transfer.getFromNumberAccount());
         Account accountTo = accountDaoWithCRUD.getAccountByNumberAccount(transfer.getToNumberAccount());
 
-        accountFrom.setBalance(accountFrom.getBalance().subtract(transfer.getBalance()));
-        accountTo.setBalance(accountTo.getBalance().add(transfer.getBalance()));
+        if(accountFrom.getBalance().subtract(transfer.getBalance()).compareTo(BigDecimal.valueOf(0)) == 1) //walidacja czy masz >0 pieniedzy na koncie
+        {
+            accountFrom.setBalance(accountFrom.getBalance().subtract(transfer.getBalance()));
+            accountTo.setBalance(accountTo.getBalance().add(transfer.getBalance()));
 
-        accountDaoWithCRUD.save(accountFrom);
-        accountDaoWithCRUD.save(accountTo);
+            accountDaoWithCRUD.save(accountTo);
+            accountDaoWithCRUD.save(accountFrom);
+        }
+        else
+        {
+            System.out.println("Nie masz wystarczajacej ilosc pieniedzy na koncie!");
+        }
 
         return transfer;
     }
