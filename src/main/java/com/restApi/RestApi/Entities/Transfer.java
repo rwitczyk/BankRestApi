@@ -16,8 +16,8 @@ public class Transfer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String fromIdAccount;
-    private String toIdAccount;
+    private String fromNumberAccount;
+    private String toNumberAccount;
     private BigDecimal balance;
     private String currency;
 }
