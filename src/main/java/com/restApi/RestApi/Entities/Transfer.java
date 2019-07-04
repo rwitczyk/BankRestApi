@@ -7,7 +7,6 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.Min;
 import java.math.BigDecimal;
-import java.util.Date;
 
 @Entity
 @Getter
@@ -25,6 +24,7 @@ public class Transfer {
     private BigDecimal balance;
 
     private String currency;
-    private Date createTransferDate;
-    private Date executeTransferDate;
+    private String createTransferDate;
+    private String executeTransferDate;
+    private String status;
 }

@@ -5,6 +5,7 @@ import com.restApi.RestApi.Daos.TransferDao;
 import com.restApi.RestApi.Data.Currency;
 import com.restApi.RestApi.Entities.Account;
 import com.restApi.RestApi.Entities.Transfer;
+import com.restApi.RestApi.StatusTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -12,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -33,9 +35,11 @@ public class TransferServiceImpl implements TransferService {
 
     @Override
     public Transfer saveNewTransfer(Transfer transferData) {
+        transferData.setCreateTransferDate(String.valueOf(LocalDateTime.now()));
+        transferData.setStatus(String.valueOf(StatusTransfer.CREATED));
+
         Transfer transfer = transferDao.save(transferData);
         transferBalanceBefore = transfer.getBalance();
-
 
         accountFrom = accountDaoWithCRUD.getAccountByNumberAccount(transfer.getFromNumberAccount());
         accountTo = accountDaoWithCRUD.getAccountByNumberAccount(transfer.getToNumberAccount());
@@ -70,6 +74,20 @@ public class TransferServiceImpl implements TransferService {
 
         transferBalanceAfter = transferBalanceBefore.multiply(BigDecimal.valueOf(multiplyCurrency));
         transferBalanceAfter = transferBalanceAfter.setScale(2, RoundingMode.CEILING);
+    }
+
+    public void finishTransfers()
+    {
+        Iterable<Transfer> transfers = transferDao.findAll();
+        if(transfers!=null) {
+            transfers.forEach(transfer -> {
+                if (transfer.getStatus().equals(String.valueOf(StatusTransfer.CREATED))) {
+                    transfer.setStatus(String.valueOf(StatusTransfer.DONE));
+                    transfer.setExecuteTransferDate(String.valueOf(LocalDateTime.now()));
+                    transferDao.save(transfer);
+                }
+            });
+        }
     }
 
     @Override

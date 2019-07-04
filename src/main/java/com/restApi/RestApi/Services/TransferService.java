@@ -11,4 +11,6 @@ public interface TransferService {
     Iterable<Transfer> getAllTransfers();
 
     List<Transfer> getTranfersByNumberAccount(String numberAccount);
+
+    void finishTransfers();
 }
