@@ -6,6 +6,8 @@ import com.restApi.RestApi.Data.Currency;
 import com.restApi.RestApi.Entities.Account;
 import com.restApi.RestApi.Entities.Transfer;
 import com.restApi.RestApi.StatusTransfer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -25,6 +27,8 @@ public class TransferServiceImpl implements TransferService {
 
     @Autowired
     AccountDaoWithCRUD accountDaoWithCRUD;
+
+    private static final Logger log = LoggerFactory.getLogger(TransferServiceImpl.class);
 
     private String currencyFrom;
     private String currencyTo;
@@ -55,7 +59,7 @@ public class TransferServiceImpl implements TransferService {
         }
         else
         {
-            System.out.println("Nie masz wystarczajacej ilosc pieniedzy na koncie!");
+            log.error("Nie masz wystarczajacej ilosc pieniedzy na koncie!");
         }
 
         return transfer;
@@ -70,7 +74,7 @@ public class TransferServiceImpl implements TransferService {
         Currency currency = restTemplate.getForObject(currencyApiUrl + currencyFrom, Currency.class);
 
         double multiplyCurrency = currency.getRates().get(currencyTo);
-        System.out.println("MNOZNIK: " + multiplyCurrency);
+        log.info("MNOZNIK: " + multiplyCurrency);
 
         transferBalanceAfter = transferBalanceBefore.multiply(BigDecimal.valueOf(multiplyCurrency));
         transferBalanceAfter = transferBalanceAfter.setScale(2, RoundingMode.CEILING);
@@ -78,6 +82,7 @@ public class TransferServiceImpl implements TransferService {
 
     public void finishTransfers()
     {
+        log.info("Finishing transfers...");
         Iterable<Transfer> transfers = transferDao.findAll();
         if(transfers!=null) {
             transfers.forEach(transfer -> {
