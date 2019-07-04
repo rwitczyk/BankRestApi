@@ -19,16 +19,14 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account getAccountByIdAccount(int accountId) {
-        Account account = accountDaoWithCRUD.getAccountsById(accountId);
 
-        return account;
+        return accountDaoWithCRUD.getAccountsById(accountId);
     }
 
     @Override
     public Account getAccountByNumberAccount(String numberAccount) {
-        Account account = accountDao.getAccountByNumberOfAccount(numberAccount);
 
-        return account;
+        return accountDao.getAccountByNumberOfAccount(numberAccount);
     }
 
     @Override

@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 
 @Entity
@@ -18,9 +19,8 @@ public class Account {
     private int id;
 
     @Column(name = "numberAccount") // nazwa ktora bedzie w bazce w tabeli
+    @Size(min = 4,max = 4)
     private String numberAccount;
-   // @Size(min = 26)
-  //  @Size(max = 26)
 
     @Column(name = "currency")
     private String currency;
