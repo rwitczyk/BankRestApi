@@ -46,6 +46,7 @@ public class TransferServiceImpl implements TransferService {
 
         accountFrom = accountDaoWithCRUD.getAccountByNumberAccount(transferData.getFromNumberAccount());
         accountTo = accountDaoWithCRUD.getAccountByNumberAccount(transferData.getToNumberAccount());
+        transferData.setCurrency(accountTo.getCurrency());
 
         if(accountFrom.getBalance().subtract(transferData.getBalance()).compareTo(BigDecimal.valueOf(0)) == 1) //walidacja czy masz >0 pieniedzy na koncie
         {
