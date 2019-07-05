@@ -22,11 +22,14 @@ import java.util.List;
 @Transactional
 public class TransferServiceImpl implements TransferService {
 
-    @Autowired
-    TransferDao transferDao;
+    private TransferDao transferDao;
+    private AccountDaoWithCRUD accountDaoWithCRUD;
 
     @Autowired
-    AccountDaoWithCRUD accountDaoWithCRUD;
+    public TransferServiceImpl(TransferDao transferDao,AccountDaoWithCRUD accountDaoWithCRUD) {
+        this.transferDao = transferDao;
+        this.accountDaoWithCRUD = accountDaoWithCRUD;
+    }
 
     private static final Logger log = LoggerFactory.getLogger(TransferServiceImpl.class);
 

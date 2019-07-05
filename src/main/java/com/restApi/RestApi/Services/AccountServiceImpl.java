@@ -11,11 +11,14 @@ import javax.transaction.Transactional;
 @Service
 @Transactional
 public class AccountServiceImpl implements AccountService {
+    private AccountDao accountDao;
+    private AccountDaoWithCRUD accountDaoWithCRUD;
 
     @Autowired
-    private AccountDao accountDao;
-    @Autowired
-    private AccountDaoWithCRUD accountDaoWithCRUD;
+    public AccountServiceImpl(AccountDao accountDao,AccountDaoWithCRUD accountDaoWithCRUD) {
+        this.accountDao = accountDao;
+        this.accountDaoWithCRUD = accountDaoWithCRUD;
+    }
 
     @Override
     public Account getAccountByIdAccount(int accountId) {
