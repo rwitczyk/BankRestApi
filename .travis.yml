@@ -2,8 +2,8 @@ language: java
 
 before_install:
   - chmod +x mvnw
-
-deploy:
-  provider: heroku
-  api_key:
-    secure: "24888aae-436e-4326-96a3-1f6bb6d0fe21"
+#
+#deploy:
+#  provider: heroku
+#  api_key:
+#    secure: "24888aae-436e-4326-96a3-1f6bb6d0fe21"
