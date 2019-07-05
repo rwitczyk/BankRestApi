@@ -99,14 +99,17 @@ public class TransferServiceImpl implements TransferService {
                     transfer.setExecuteTransferDate(String.valueOf(LocalDateTime.now()));
                     transferDao.save(transfer);
 
-                    //add money to destination account
-                    transferBalanceAfter = transfer.getBalance();
-                    accountTo = accountDaoWithCRUD.getAccountByNumberAccount(transfer.getToNumberAccount());
-                    accountTo.setBalance(accountTo.getBalance().add(transferBalanceAfter));
-                    accountDaoWithCRUD.save(accountTo);
+                    addMoneyToDestinationAccount(transfer);
                 }
             });
         }
+    }
+
+    private void addMoneyToDestinationAccount(Transfer transfer) {
+        transferBalanceAfter = transfer.getBalance();
+        accountTo = accountDaoWithCRUD.getAccountByNumberAccount(transfer.getToNumberAccount());
+        accountTo.setBalance(accountTo.getBalance().add(transferBalanceAfter));
+        accountDaoWithCRUD.save(accountTo);
     }
 
     @Override
