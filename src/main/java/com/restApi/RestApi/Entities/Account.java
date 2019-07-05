@@ -31,4 +31,11 @@ public class Account {
     @Column(name = "balance")
     @Min(0)
     private BigDecimal balance;
+
+    public Account(@Size(min = 4, max = 4) String numberAccount, String currency, String name, @Min(0) BigDecimal balance) {
+        this.numberAccount = numberAccount;
+        this.currency = currency;
+        this.name = name;
+        this.balance = balance;
+    }
 }

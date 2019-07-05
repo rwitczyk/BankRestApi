@@ -35,11 +35,18 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Account changeNameAccountByIdAccount(int accountId, Account account) {
         Account accountToChange = accountDaoWithCRUD.getAccountsById(accountId);
-        
-        accountToChange.setName(account.getName());
-        
+
+        setNewNameToAccount(accountToChange, account.getName());
+
         accountDaoWithCRUD.save(accountToChange);
         
+        return accountToChange;
+    }
+
+    @Override
+    public Account setNewNameToAccount(Account accountToChange,String name) {
+        accountToChange.setName(name);
+
         return accountToChange;
     }
 }

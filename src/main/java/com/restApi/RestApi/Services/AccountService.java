@@ -9,4 +9,6 @@ public interface AccountService {
     Account getAccountByNumberAccount(String numberAccount);
 
     Account changeNameAccountByIdAccount(int accountId,Account account);
+
+    Account setNewNameToAccount(Account accountToChange, String name);
 }
