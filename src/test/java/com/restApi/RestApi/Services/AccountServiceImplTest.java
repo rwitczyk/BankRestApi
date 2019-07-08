@@ -26,7 +26,7 @@ public class AccountServiceImplTest {
 
         Account accountToChange = new Account("2222","PLN","Robert", BigDecimal.valueOf(100));
         String name = "Janusz";
-        Account accountResult = new Account("2222","PLN","Janusz", BigDecimal.valueOf(100));
+        Account accountResult = new Account("2222","PLN","Januszek", BigDecimal.valueOf(100));
 
         Assert.assertEquals(accountResult,accountService.setNewNameToAccount(accountToChange,name));
     }
