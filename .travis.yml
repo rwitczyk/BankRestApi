@@ -7,18 +7,18 @@ sudo: true
 before_install:
   - chmod +x mvnw
 
-#spring:
-#  datasource:
-#    url: ${jdbc:mysql://localhost:3306/accounts_database?useSSL=false&serverTimezone=UTC}
-#    username: ${root}
-#    password: ${Password1!}
-#
+spring:
+  datasource:
+    url: ${jdbc:mysql://localhost:3306/accounts_database?useSSL=false&serverTimezone=UTC}
+    username: ${root}
+    password: ${Password1!}
 
 
-#deploy:
-#  provider: heroku
-#  api_key:
-#    secure: "24888aae-436e-4326-96a3-1f6bb6d0fe21"
-#  app: BankRestApi
-#  on:
-#    repo: rwitczyk/BankRestApi
+
+deploy:
+  provider: heroku
+  api_key:
+    secure: "24888aae-436e-4326-96a3-1f6bb6d0fe21"
+  app: BankRestApi
+  on:
+    repo: rwitczyk/BankRestApi
