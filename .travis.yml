@@ -12,7 +12,7 @@ spring:
     url: ${jdbc:mysql://localhost:3306/accounts_database?useSSL=false&serverTimezone=UTC}
     username: ${root}
     password: ${Password1!}
-
+#
 
 deploy:
   provider: heroku
