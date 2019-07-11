@@ -20,14 +20,15 @@ public class AccountDaoImpl implements AccountDao{
 
     @Override
     @Transactional
-    public void addAccount(Account account) {
+    public Account addAccount(Account account) {
         try{
-        entityManager.merge(account);
+         return entityManager.merge(account);
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
+        return null;
     }
 
     @Override

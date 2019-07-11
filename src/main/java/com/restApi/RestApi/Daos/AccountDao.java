@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface AccountDao {
 
-    void addAccount(Account account);
+    Account addAccount(Account account);
 
     List<Account> getAllAccounts();
 

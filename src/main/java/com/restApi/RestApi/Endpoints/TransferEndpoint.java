@@ -24,9 +24,9 @@ public class TransferEndpoint {
     @PostMapping("/transfer/new")
     public ResponseEntity<Transfer> newTransfer(@RequestBody Transfer transferData)
     {
-        boolean ifExecuted = transferService.saveNewTransfer(transferData);
+        boolean ifExecutedTransfer = transferService.saveNewTransfer(transferData);
 
-        if(ifExecuted) {
+        if(ifExecutedTransfer) {
             return new ResponseEntity<>(HttpStatus.OK);
         }
         else
@@ -40,7 +40,13 @@ public class TransferEndpoint {
     {
         Iterable<Transfer> transfers = transferService.getAllTransfers();
 
-        return new ResponseEntity<>(transfers,HttpStatus.OK);
+        if(transfers != null) {
+            return new ResponseEntity<>(transfers, HttpStatus.OK);
+        }
+        else
+        {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping("/transfers/{numberAccount}")
@@ -48,6 +54,12 @@ public class TransferEndpoint {
     {
         List<Transfer> transfers = transferService.getTranfersByNumberAccount(numberAccount);
 
-        return new ResponseEntity<>(transfers,HttpStatus.OK);
+        if(transfers != null) {
+            return new ResponseEntity<>(transfers, HttpStatus.OK);
+        }
+        else
+        {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }

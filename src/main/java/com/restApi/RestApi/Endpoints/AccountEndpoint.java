@@ -54,9 +54,18 @@ public class AccountEndpoint {
     }
 
     @PostMapping("accounts/add")
-    public void addAccount(@RequestBody Account account)
+    public ResponseEntity addAccount(@RequestBody Account account)
     {
-        accountDao.addAccount(account);
+       boolean ifAccountAdded = accountService.addAccount(account);
+
+       if(ifAccountAdded)
+       {
+           return new ResponseEntity(HttpStatus.CREATED);
+       }
+       else
+       {
+           return new ResponseEntity(HttpStatus.BAD_REQUEST);
+       }
     }
 
     @PostMapping("accounts/edit/name/{idAccount}")

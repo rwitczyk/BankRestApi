@@ -60,4 +60,11 @@ public class AccountServiceImpl implements AccountService {
             return false;
         }
     }
+
+    @Override
+    public boolean addAccount(Account account) {
+        Account accountResult = accountDao.addAccount(account);
+
+        return accountResult != null;
+    }
 }
