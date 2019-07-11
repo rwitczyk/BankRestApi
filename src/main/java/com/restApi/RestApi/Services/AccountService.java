@@ -11,4 +11,6 @@ public interface AccountService {
     Account changeNameAccountByIdAccount(int accountId,Account account);
 
     Account setNewNameToAccount(Account accountToChange, String name);
+
+    boolean deleteAccountByIdAccount(int accountId);
 }

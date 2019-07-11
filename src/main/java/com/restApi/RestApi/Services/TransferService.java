@@ -6,7 +6,7 @@ import com.restApi.RestApi.Entities.Transfer;
 import java.util.List;
 
 public interface TransferService {
-    Transfer saveNewTransfer(Transfer transfer);
+    boolean saveNewTransfer(Transfer transfer);
 
     Iterable<Transfer> getAllTransfers();
 

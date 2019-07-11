@@ -49,4 +49,15 @@ public class AccountServiceImpl implements AccountService {
 
         return accountToChange;
     }
+
+    @Override
+    public boolean deleteAccountByIdAccount(int accountId) {
+        if (accountDaoWithCRUD.getAccountsById(accountId) != null) {
+            accountDaoWithCRUD.deleteAccountsById(accountId);
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 }

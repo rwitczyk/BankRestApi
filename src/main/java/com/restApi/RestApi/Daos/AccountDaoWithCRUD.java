@@ -7,5 +7,7 @@ public interface AccountDaoWithCRUD extends CrudRepository<Account,Integer> {
 
     Account getAccountsById(int id);
 
-    Account getAccountByNumberAccount(String id);
+    Account getAccountByNumberAccount(String numberAccount);
+
+    void deleteAccountsById(int id);
 }

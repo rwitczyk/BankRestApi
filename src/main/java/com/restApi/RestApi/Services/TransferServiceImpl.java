@@ -41,30 +41,34 @@ public class TransferServiceImpl implements TransferService {
     private BigDecimal transferBalanceAfter;
 
     @Override
-    public Transfer saveNewTransfer(Transfer transferData) {
-        transferData.setCreateTransferDate(String.valueOf(LocalDateTime.now()));
-        transferData.setStatus(String.valueOf(StatusTransfer.CREATED));
-
-        transferBalanceBefore = transferData.getBalance();
-
+    public boolean saveNewTransfer(Transfer transferData) {
         accountFrom = accountDaoWithCRUD.getAccountByNumberAccount(transferData.getFromNumberAccount());
         accountTo = accountDaoWithCRUD.getAccountByNumberAccount(transferData.getToNumberAccount());
-        transferData.setCurrency(accountTo.getCurrency());
-
         if(accountFrom.getBalance().subtract(transferData.getBalance()).compareTo(BigDecimal.valueOf(0)) == 1) //walidacja czy masz >0 pieniedzy na koncie
         {
-            accountFrom.setBalance(accountFrom.getBalance().subtract(transferData.getBalance())); //substract money from source account
-            convertCurrency();
-            transferData.setBalance(transferBalanceAfter);
+            if(accountTo != null) { // czy konto docelowe istnieje
+              transferData.setCreateTransferDate(String.valueOf(LocalDateTime.now()));
+              transferData.setStatus(String.valueOf(StatusTransfer.CREATED));
+              transferBalanceBefore = transferData.getBalance();
+              transferData.setCurrency(accountTo.getCurrency());
 
-            accountDaoWithCRUD.save(accountFrom);
+              accountFrom.setBalance(accountFrom.getBalance().subtract(transferData.getBalance())); //substract money from source account
+                convertCurrency();
+                transferData.setBalance(transferBalanceAfter);
+
+                accountDaoWithCRUD.save(accountFrom);
+                transferDao.save(transferData);
+
+                return true;
+            }
         }
         else
         {
             log.error("Nie masz wystarczajacej ilosc pieniedzy na koncie!");
+            return false;
         }
 
-        return transferDao.save(transferData);
+        return false;
     }
 
     public void convertCurrency() {

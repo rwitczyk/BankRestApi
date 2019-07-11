@@ -27,9 +27,7 @@ public class AccountEndpoint {
 
     @GetMapping("accounts")
     public List<Account> getAllAccounts()
-    {
-        return accountDao.getAllAccounts();
-    }
+    {return accountDao.getAllAccounts();}
 
     @GetMapping("accounts/number/{numberAccount}")
     public ResponseEntity<Account> getAccountByNumberAccount(@PathVariable String numberAccount)
@@ -64,6 +62,7 @@ public class AccountEndpoint {
     @PostMapping("accounts/edit/name/{idAccount}")
     public ResponseEntity<Account> editNameAccount(@RequestBody Account accountData,@PathVariable int idAccount)
     {
+        System.out.println("EDIT NAME");
        Account account = accountService.changeNameAccountByIdAccount(idAccount,accountData);
 
         if(account != null) {
@@ -72,5 +71,20 @@ public class AccountEndpoint {
         else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("accounts/delete/{idAccount}")
+    public ResponseEntity deleteAccount(@PathVariable int idAccount)
+    {
+        boolean ifDeleted;
+        ifDeleted = accountService.deleteAccountByIdAccount(idAccount);
+
+        if(ifDeleted) {
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
     }
 }

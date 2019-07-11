@@ -24,10 +24,10 @@ public class TransferEndpoint {
     @PostMapping("/transfer/new")
     public ResponseEntity<Transfer> newTransfer(@RequestBody Transfer transferData)
     {
-        Transfer transfer = transferService.saveNewTransfer(transferData);
+        boolean ifExecuted = transferService.saveNewTransfer(transferData);
 
-        if(transfer != null) {
-            return new ResponseEntity<>(transfer, HttpStatus.OK);
+        if(ifExecuted) {
+            return new ResponseEntity<>(HttpStatus.OK);
         }
         else
         {
