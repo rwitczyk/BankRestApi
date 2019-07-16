@@ -10,7 +10,9 @@ public interface TransferService {
 
     Iterable<Transfer> getAllTransfers();
 
-    List<Transfer> getTranfersByNumberAccount(String numberAccount);
+    List<Transfer> getTransfersByFromNumberAccount(String numberAccount);
 
     void finishTransfers();
+
+    List<Transfer> getTransfersByToNumberAccount(String numberAccount);
 }

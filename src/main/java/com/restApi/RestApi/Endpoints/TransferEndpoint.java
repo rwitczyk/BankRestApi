@@ -49,10 +49,24 @@ public class TransferEndpoint {
         }
     }
 
-    @GetMapping("/transfers/{numberAccount}")
-    public ResponseEntity<List<Transfer>> getTransfersByNumberAccount(@PathVariable String numberAccount)
+    @GetMapping("/transfers/from/{numberAccount}")
+    public ResponseEntity<List<Transfer>> getTransfersByFromNumberAccount(@PathVariable String numberAccount)
     {
-        List<Transfer> transfers = transferService.getTranfersByNumberAccount(numberAccount);
+        List<Transfer> transfers = transferService.getTransfersByFromNumberAccount(numberAccount);
+
+        if(transfers != null) {
+            return new ResponseEntity<>(transfers, HttpStatus.OK);
+        }
+        else
+        {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/transfers/to/{numberAccount}")
+    public ResponseEntity<List<Transfer>> getTransfersByToNumberAccount(@PathVariable String numberAccount)
+    {
+        List<Transfer> transfers = transferService.getTransfersByToNumberAccount(numberAccount);
 
         if(transfers != null) {
             return new ResponseEntity<>(transfers, HttpStatus.OK);

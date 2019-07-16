@@ -109,6 +109,7 @@ public class TransferServiceImpl implements TransferService {
         }
     }
 
+
     private void addMoneyToDestinationAccount(Transfer transfer) {
         transferBalanceAfter = transfer.getBalance();
         accountTo = accountDaoWithCRUD.getAccountByNumberAccount(transfer.getToNumberAccount());
@@ -122,7 +123,12 @@ public class TransferServiceImpl implements TransferService {
     }
 
     @Override
-    public List<Transfer> getTranfersByNumberAccount(String numberAccount) {
+    public List<Transfer> getTransfersByFromNumberAccount(String numberAccount) {
         return transferDao.getTransfersByFromNumberAccount(numberAccount);
+    }
+
+    @Override
+    public List<Transfer> getTransfersByToNumberAccount(String numberAccount) {
+        return transferDao.getTransfersByToNumberAccount(numberAccount);
     }
 }
