@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.Currency;
 
 @Service
 @Transactional
@@ -37,7 +38,6 @@ public class AccountServiceImpl implements AccountService {
         Account accountToChange = accountDaoWithCRUD.getAccountsById(accountId);
 
         setNewNameToAccount(accountToChange, account.getName());
-
         accountDaoWithCRUD.save(accountToChange);
         
         return accountToChange;
@@ -63,8 +63,13 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public boolean addAccount(Account account) {
-        Account accountResult = accountDao.addAccount(account);
-
-        return accountResult != null;
+        if(Currency.getInstance(account.getCurrency()) != null) {
+            accountDao.addAccount(account);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }
