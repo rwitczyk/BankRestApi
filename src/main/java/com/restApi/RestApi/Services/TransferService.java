@@ -15,4 +15,6 @@ public interface TransferService {
     void finishTransfers();
 
     List<Transfer> getTransfersByToNumberAccount(String numberAccount);
+
+    boolean cancelTransfer(Transfer transfer);
 }

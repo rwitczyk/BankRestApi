@@ -76,4 +76,17 @@ public class TransferEndpoint {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+    @PostMapping("/transfers/cancel")
+    public ResponseEntity cancelTransfer(@RequestBody Transfer transfer)
+    {
+        if(transferService.cancelTransfer(transfer))
+        {
+            return new ResponseEntity(HttpStatus.OK);
+        }
+        else
+        {
+            return new ResponseEntity(HttpStatus.NOT_FOUND);
+        }
+    }
 }

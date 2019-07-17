@@ -21,9 +21,12 @@ public class Transfer {
     private String fromNumberAccount;
     private String toNumberAccount;
     @Min(0)
-    private BigDecimal balance;
+    private BigDecimal balanceAfterChangeCurrency;
 
-    private String currency;
+    @Min(0)
+    private BigDecimal balanceBeforeChangeCurrency;
+
+    private String currencyDestinationAccount;
     private String createTransferDate;
     private String executeTransferDate;
     private String status;

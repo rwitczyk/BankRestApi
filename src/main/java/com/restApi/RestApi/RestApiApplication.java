@@ -24,7 +24,7 @@ public class RestApiApplication {
 		SpringApplication.run(RestApiApplication.class, args);
 	}
 
-	@Scheduled(fixedRate = 10000)
+	@Scheduled(fixedRate = 60000)
 	public void executeTransfers() {
 	transferService.finishTransfers();
 	}
