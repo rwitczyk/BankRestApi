@@ -24,69 +24,36 @@ public class TransferEndpoint {
     @PostMapping("/transfer/new")
     public ResponseEntity<Transfer> newTransfer(@RequestBody Transfer transferData)
     {
-        boolean ifExecutedTransfer = transferService.saveNewTransfer(transferData);
-
-        if(ifExecutedTransfer) {
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        else
-        {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+       transferService.saveNewTransfer(transferData);
+       return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/transfers")
     public ResponseEntity<Iterable<Transfer>> getAllTransfers()
     {
         Iterable<Transfer> transfers = transferService.getAllTransfers();
-
-        if(transfers != null) {
-            return new ResponseEntity<>(transfers, HttpStatus.OK);
-        }
-        else
-        {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return new ResponseEntity<>(transfers,HttpStatus.OK);
     }
 
     @GetMapping("/transfers/from/{numberAccount}")
     public ResponseEntity<List<Transfer>> getTransfersByFromNumberAccount(@PathVariable String numberAccount)
     {
         List<Transfer> transfers = transferService.getTransfersByFromNumberAccount(numberAccount);
+        return new ResponseEntity<>(transfers, HttpStatus.OK);
 
-        if(transfers != null) {
-            return new ResponseEntity<>(transfers, HttpStatus.OK);
-        }
-        else
-        {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
     }
 
     @GetMapping("/transfers/to/{numberAccount}")
     public ResponseEntity<List<Transfer>> getTransfersByToNumberAccount(@PathVariable String numberAccount)
     {
         List<Transfer> transfers = transferService.getTransfersByToNumberAccount(numberAccount);
-
-        if(transfers != null) {
-            return new ResponseEntity<>(transfers, HttpStatus.OK);
-        }
-        else
-        {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return new ResponseEntity<>(transfers, HttpStatus.OK);
     }
 
     @PostMapping("/transfers/cancel")
     public ResponseEntity cancelTransfer(@RequestBody Transfer transfer)
     {
-        if(transferService.cancelTransfer(transfer))
-        {
-            return new ResponseEntity(HttpStatus.OK);
-        }
-        else
-        {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
-        }
+        transferService.cancelTransfer(transfer);
+        return new ResponseEntity(HttpStatus.OK);
     }
 }

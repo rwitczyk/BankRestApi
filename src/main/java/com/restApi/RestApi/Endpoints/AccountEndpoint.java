@@ -33,67 +33,34 @@ public class AccountEndpoint {
     public ResponseEntity<Account> getAccountByNumberAccount(@PathVariable String numberAccount)
     {
         Account account = accountService.getAccountByNumberAccount(numberAccount);
-        if(account != null) {
-            return new ResponseEntity<>(account, HttpStatus.OK);
-        }
-        else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return new ResponseEntity<>(account, HttpStatus.OK);
     }
 
     @GetMapping("accounts/id/{idAccount}")
     public ResponseEntity<Account> getAccountByIdAccount(@PathVariable int idAccount)
     {
         Account account = accountService.getAccountByIdAccount(idAccount);
-        if(account != null) {
-            return new ResponseEntity<>(account, HttpStatus.OK);
-        }
-        else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return new ResponseEntity<>(account, HttpStatus.OK);
     }
 
     @PostMapping("accounts/add")
     public ResponseEntity addAccount(@RequestBody Account account)
     {
-       boolean ifAccountAdded = accountService.addAccount(account);
-
-       if(ifAccountAdded)
-       {
-           return new ResponseEntity(HttpStatus.CREATED);
-       }
-       else
-       {
-           return new ResponseEntity(HttpStatus.BAD_REQUEST);
-       }
+         accountService.addAccount(account);
+         return new ResponseEntity(HttpStatus.CREATED);
     }
 
     @PostMapping("accounts/edit/name/{idAccount}")
     public ResponseEntity<Account> editNameAccount(@RequestBody Account accountData,@PathVariable int idAccount)
     {
-        System.out.println("EDIT NAME");
        Account account = accountService.changeNameAccountByIdAccount(idAccount,accountData);
-
-        if(account != null) {
-            return new ResponseEntity<>(account, HttpStatus.OK);
-        }
-        else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+       return new ResponseEntity<>(account, HttpStatus.OK);
     }
 
     @GetMapping("accounts/delete/{idAccount}")
     public ResponseEntity deleteAccount(@PathVariable int idAccount)
     {
-        boolean ifDeleted;
-        ifDeleted = accountService.deleteAccountByIdAccount(idAccount);
-
-        if(ifDeleted) {
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
+        accountService.deleteAccountByIdAccount(idAccount);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

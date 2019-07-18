@@ -5,6 +5,10 @@ import com.restApi.RestApi.Daos.TransferDao;
 import com.restApi.RestApi.Data.Currency;
 import com.restApi.RestApi.Entities.Account;
 import com.restApi.RestApi.Entities.Transfer;
+import com.restApi.RestApi.Exceptions.account.ReturnMoneyToSourceAccountException;
+import com.restApi.RestApi.Exceptions.account.ReturnTransferByNumberAccountException;
+import com.restApi.RestApi.Exceptions.transfer.NoTransfersException;
+import com.restApi.RestApi.Exceptions.transfer.SaveNewTransferException;
 import com.restApi.RestApi.StatusTransfer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,10 +69,9 @@ public class TransferServiceImpl implements TransferService {
         else
         {
             log.error("Nie masz wystarczajacej ilosc pieniedzy na koncie!");
-            return false;
         }
 
-        return false;
+        throw new SaveNewTransferException("Brak środków na koncie lub konto nie istnieje");
     }
 
     public void convertCurrency() {
@@ -146,21 +149,37 @@ public class TransferServiceImpl implements TransferService {
 
     @Override
     public Iterable<Transfer> getAllTransfers() {
-        return transferDao.findAll();
+         if(transferDao.findAll()!=null)
+         {
+             return transferDao.findAll();
+         }
+         throw new NoTransfersException("Brak transferów do pobrania");
     }
 
     @Override
     public List<Transfer> getTransfersByFromNumberAccount(String numberAccount) {
-        return transferDao.getTransfersByFromNumberAccount(numberAccount);
+        List<Transfer> transfers = transferDao.getTransfersByFromNumberAccount(numberAccount);
+        if(transfers != null)
+        {
+            return transfers;
+        }
+        throw new ReturnTransferByNumberAccountException("Nie udalo sie pobrac transferu po numerze konta: " + numberAccount);
     }
 
     @Override
     public List<Transfer> getTransfersByToNumberAccount(String numberAccount) {
-        return transferDao.getTransfersByToNumberAccount(numberAccount);
+        List<Transfer> transfers = transferDao.getTransfersByToNumberAccount(numberAccount);
+        if(transfers != null)
+        {
+            return transfers;
+        }
+        throw new ReturnTransferByNumberAccountException("Nie udalo sie pobrac transferu po numerze konta: " + numberAccount);
     }
 
     @Override
-    public boolean cancelTransfer(Transfer transfer) {
-        return returnMoneyToSourceAccount(transfer);
+    public void cancelTransfer(Transfer transfer) {
+        if (!returnMoneyToSourceAccount(transfer)) {
+            throw new ReturnMoneyToSourceAccountException("Zwrot pieniędzy na konto źródłowe nie powiódł się");
+        }
     }
 }

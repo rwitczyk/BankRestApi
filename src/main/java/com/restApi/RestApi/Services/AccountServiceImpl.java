@@ -3,6 +3,9 @@ package com.restApi.RestApi.Services;
 import com.restApi.RestApi.Daos.AccountDao;
 import com.restApi.RestApi.Daos.AccountDaoWithCRUD;
 import com.restApi.RestApi.Entities.Account;
+import com.restApi.RestApi.Exceptions.account.AccountByIdAccountNotExistException;
+import com.restApi.RestApi.Exceptions.account.AccountByNumberAccountNotExistException;
+import com.restApi.RestApi.Exceptions.account.AddAccountException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,24 +26,38 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account getAccountByIdAccount(int accountId) {
+        Account account =  accountDaoWithCRUD.getAccountsById(accountId);
+        if(account != null){
+            return account;
+        }
 
-        return accountDaoWithCRUD.getAccountsById(accountId);
+        throw new AccountByIdAccountNotExistException("Konto o podanym id:" + accountId + " nie istnieje");
     }
 
     @Override
     public Account getAccountByNumberAccount(String numberAccount) {
+        Account account = accountDao.getAccountByNumberOfAccount(numberAccount);
+        if(account != null)
+        {
+            return account;
+        }
 
-        return accountDao.getAccountByNumberOfAccount(numberAccount);
+        throw new AccountByNumberAccountNotExistException("Konto o podanym numerze:" + numberAccount + " nie istnieje");
     }
 
     @Override
     public Account changeNameAccountByIdAccount(int accountId, Account account) {
         Account accountToChange = accountDaoWithCRUD.getAccountsById(accountId);
 
-        setNewNameToAccount(accountToChange, account.getName());
-        accountDaoWithCRUD.save(accountToChange);
-        
-        return accountToChange;
+        if(accountToChange != null) {
+            setNewNameToAccount(accountToChange, account.getName());
+            accountDaoWithCRUD.save(accountToChange);
+            return accountToChange;
+        }
+        else
+        {
+            throw new AccountByIdAccountNotExistException("Konto o podanym id:" + accountId + " nie istnieje");
+        }
     }
 
     @Override
@@ -51,25 +68,23 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public boolean deleteAccountByIdAccount(int accountId) {
+    public void deleteAccountByIdAccount(int accountId) {
         if (accountDaoWithCRUD.getAccountsById(accountId) != null) {
             accountDaoWithCRUD.deleteAccountsById(accountId);
-            return true;
         }
         else {
-            return false;
+            throw new AccountByIdAccountNotExistException("Konto o podanym id:" + accountId + " nie istnieje");
         }
     }
 
     @Override
-    public boolean addAccount(Account account) {
+    public void addAccount(Account account) {
         if(Currency.getInstance(account.getCurrency()) != null) {
             accountDao.addAccount(account);
-            return true;
         }
         else
         {
-            return false;
+            throw new AddAccountException("Nie mozna dodac konta - sprawdz poprawnosc danych");
         }
     }
 }
