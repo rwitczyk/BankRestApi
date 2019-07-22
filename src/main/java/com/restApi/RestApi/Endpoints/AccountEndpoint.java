@@ -16,50 +16,45 @@ import java.util.List;
 public class AccountEndpoint {
 
     private AccountService accountService;
+    private final AccountDao accountDao;
 
     @Autowired
-    public AccountEndpoint(AccountService accountService) {
+    public AccountEndpoint(AccountService accountService, AccountDao accountDao) {
         this.accountService = accountService;
+        this.accountDao = accountDao;
     }
 
-    @Autowired
-    private AccountDao accountDao;
-
     @GetMapping("accounts")
-    public List<Account> getAllAccounts()
-    {return accountDao.getAllAccounts();}
+    public List<Account> getAllAccounts() {
+        return accountDao.getAllAccounts();
+    }
 
     @GetMapping("accounts/number/{numberAccount}")
-    public ResponseEntity<Account> getAccountByNumberAccount(@PathVariable String numberAccount)
-    {
+    public ResponseEntity<Account> getAccountByNumberAccount(@PathVariable String numberAccount) {
         Account account = accountService.getAccountByNumberAccount(numberAccount);
         return new ResponseEntity<>(account, HttpStatus.OK);
     }
 
     @GetMapping("accounts/id/{idAccount}")
-    public ResponseEntity<Account> getAccountByIdAccount(@PathVariable int idAccount)
-    {
+    public ResponseEntity<Account> getAccountByIdAccount(@PathVariable int idAccount) {
         Account account = accountService.getAccountByIdAccount(idAccount);
         return new ResponseEntity<>(account, HttpStatus.OK);
     }
 
     @PostMapping("accounts/add")
-    public ResponseEntity addAccount(@RequestBody Account account)
-    {
-         accountService.addAccount(account);
-         return new ResponseEntity(HttpStatus.CREATED);
+    public ResponseEntity addAccount(@RequestBody Account account) {
+        accountService.addAccount(account);
+        return new ResponseEntity(HttpStatus.CREATED);
     }
 
     @PostMapping("accounts/edit/name/{idAccount}")
-    public ResponseEntity<Account> editNameAccount(@RequestBody Account accountData,@PathVariable int idAccount)
-    {
-       Account account = accountService.changeNameAccountByIdAccount(idAccount,accountData);
-       return new ResponseEntity<>(account, HttpStatus.OK);
+    public ResponseEntity<Account> editNameAccount(@RequestBody Account accountData, @PathVariable int idAccount) {
+        Account account = accountService.changeNameAccountByIdAccount(idAccount, accountData);
+        return new ResponseEntity<>(account, HttpStatus.OK);
     }
 
     @GetMapping("accounts/delete/{idAccount}")
-    public ResponseEntity deleteAccount(@PathVariable int idAccount)
-    {
+    public ResponseEntity deleteAccount(@PathVariable int idAccount) {
         accountService.deleteAccountByIdAccount(idAccount);
         return new ResponseEntity<>(HttpStatus.OK);
     }

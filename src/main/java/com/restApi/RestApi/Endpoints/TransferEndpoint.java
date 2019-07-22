@@ -24,7 +24,7 @@ public class TransferEndpoint {
     @PostMapping("/transfer/new")
     public ResponseEntity<Transfer> newTransfer(@RequestBody Transfer transferData)
     {
-       transferService.saveNewTransfer(transferData);
+       transferService.createTransfer(transferData);
        return new ResponseEntity<>(HttpStatus.OK);
     }
 

@@ -8,4 +8,5 @@ import java.util.List;
 public interface TransferDao extends CrudRepository<Transfer,Integer> {
     List<Transfer> getTransfersByFromNumberAccount(String numberAccount);
     List<Transfer> getTransfersByToNumberAccount(String numberAccount);
+    List<Transfer> getTransfersByStatus(String status);
 }

@@ -9,6 +9,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @Repository
+@Transactional
 public class AccountDaoImpl implements AccountDao{
 
     private EntityManager entityManager;
@@ -19,9 +20,8 @@ public class AccountDaoImpl implements AccountDao{
     }
 
     @Override
-    @Transactional
-    public Account addAccount(Account account) {
-         return entityManager.merge(account);
+    public void addAccount(Account account) {
+         entityManager.merge(account);
     }
 
     @Override
