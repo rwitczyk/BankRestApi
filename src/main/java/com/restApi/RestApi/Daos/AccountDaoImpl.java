@@ -28,7 +28,6 @@ public class AccountDaoImpl implements AccountDao{
     public List<Account> getAllAccounts() {
         return entityManager.createQuery("FROM Account",Account.class)
                 .getResultList();
-
     }
 
     @Override

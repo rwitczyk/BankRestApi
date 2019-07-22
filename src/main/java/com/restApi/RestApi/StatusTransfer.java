@@ -6,6 +6,7 @@ public enum StatusTransfer {
     CANCELLED("CANCELLED");
 
     String value;
+
     StatusTransfer(String value) {
         this.value = value;
     }

@@ -75,11 +75,10 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void addAccount(Account account) {
-        try{
+        try {
             Currency.getInstance(account.getCurrency());
             accountDao.addAccount(account);
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             throw new AddAccountException("Nie mozna dodac konta - sprawdz poprawnosc danych");
         }
 

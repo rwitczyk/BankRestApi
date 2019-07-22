@@ -24,11 +24,10 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder authentication)
-            throws Exception
-    {
+            throws Exception {
         authentication.inMemoryAuthentication()
-            .withUser("admin")
-            .password(passwordEncoder().encode("password"))
+                .withUser("admin")
+                .password(passwordEncoder().encode("password"))
                 .authorities("ROLE_USER");
     }
 

@@ -42,14 +42,13 @@ public class TransferServiceImpl implements TransferService {
     }
 
     @Override
-    public boolean createTransfer(Transfer transferData) {
+    public void createTransfer(Transfer transferData) {
         accountFrom = accountDaoWithCRUD.getAccountByNumberAccount(transferData.getFromNumberAccount());
         accountTo = accountDaoWithCRUD.getAccountByNumberAccount(transferData.getToNumberAccount());
         if (isEnoughMoneyOnSourceAccount(transferData)) {
             if (accountTo != null) { // czy konto docelowe istnieje
                 saveNewTransfer(transferData);
                 subtractMoneyFromSourceAccount(transferData);
-                return true;
             }
         } else {
             log.error("Nie masz wystarczajacej ilosc pieniedzy na koncie!");

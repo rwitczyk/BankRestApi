@@ -13,19 +13,19 @@ import org.springframework.scheduling.annotation.Scheduled;
 @EnableScheduling
 public class RestApiApplication {
 
-	private final TransferService transferService;
+    private final TransferService transferService;
 
-	@Autowired
-	public RestApiApplication(TransferService transferService) {
-		this.transferService = transferService;
-	}
+    @Autowired
+    public RestApiApplication(TransferService transferService) {
+        this.transferService = transferService;
+    }
 
-	public static void main(String[] args) {
-		SpringApplication.run(RestApiApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(RestApiApplication.class, args);
+    }
 
-	@Scheduled(fixedRate = 60000)
-	public void executeTransfers() {
-	transferService.finishTransfers();
-	}
+    @Scheduled(fixedRate = 60000)
+    public void executeTransfers() {
+        transferService.finishTransfers();
+    }
 }

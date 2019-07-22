@@ -22,37 +22,32 @@ public class TransferEndpoint {
     }
 
     @PostMapping("/transfer/new")
-    public ResponseEntity<Transfer> newTransfer(@RequestBody Transfer transferData)
-    {
-       transferService.createTransfer(transferData);
-       return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<Transfer> newTransfer(@RequestBody Transfer transferData) {
+        transferService.createTransfer(transferData);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/transfers")
-    public ResponseEntity<Iterable<Transfer>> getAllTransfers()
-    {
+    public ResponseEntity<Iterable<Transfer>> getAllTransfers() {
         Iterable<Transfer> transfers = transferService.getAllTransfers();
-        return new ResponseEntity<>(transfers,HttpStatus.OK);
+        return new ResponseEntity<>(transfers, HttpStatus.OK);
     }
 
     @GetMapping("/transfers/from/{numberAccount}")
-    public ResponseEntity<List<Transfer>> getTransfersByFromNumberAccount(@PathVariable String numberAccount)
-    {
+    public ResponseEntity<List<Transfer>> getTransfersByFromNumberAccount(@PathVariable String numberAccount) {
         List<Transfer> transfers = transferService.getTransfersByFromNumberAccount(numberAccount);
         return new ResponseEntity<>(transfers, HttpStatus.OK);
 
     }
 
     @GetMapping("/transfers/to/{numberAccount}")
-    public ResponseEntity<List<Transfer>> getTransfersByToNumberAccount(@PathVariable String numberAccount)
-    {
+    public ResponseEntity<List<Transfer>> getTransfersByToNumberAccount(@PathVariable String numberAccount) {
         List<Transfer> transfers = transferService.getTransfersByToNumberAccount(numberAccount);
         return new ResponseEntity<>(transfers, HttpStatus.OK);
     }
 
     @PostMapping("/transfers/cancel")
-    public ResponseEntity cancelTransfer(@RequestBody Transfer transfer)
-    {
+    public ResponseEntity cancelTransfer(@RequestBody Transfer transfer) {
         transferService.cancelTransfer(transfer);
         return new ResponseEntity(HttpStatus.OK);
     }
