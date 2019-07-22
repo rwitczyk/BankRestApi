@@ -1,6 +1,5 @@
 package com.restApi.RestApi.Entities;
 
-
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

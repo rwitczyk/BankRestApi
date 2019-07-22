@@ -15,6 +15,4 @@ public class Currency {
     private String base;
 
     private String date;
-
-
 }
