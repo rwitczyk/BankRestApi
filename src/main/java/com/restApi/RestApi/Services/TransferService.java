@@ -2,20 +2,21 @@ package com.restApi.RestApi.Services;
 
 
 import com.restApi.RestApi.Entities.Transfer;
+import com.restApi.RestApi.Entities.TransferDto;
 
 import java.util.List;
 
 public interface TransferService {
 
-    void createTransfer(Transfer transfer);
+    boolean createTransfer(TransferDto transferdto);
 
     Iterable<Transfer> getAllTransfers();
 
-    List<Transfer> getTransfersByFromNumberAccount(String numberAccount);
-
     void finishTransfers();
 
-    List<Transfer> getTransfersByToNumberAccount(String numberAccount);
+    List<TransferDto> getTransfersByFromNumberAccount(String numberAccount);
+
+    List<TransferDto> getTransfersByToNumberAccount(String numberAccount);
 
     void cancelTransfer(Transfer transfer);
 }

@@ -1,6 +1,7 @@
 package com.restApi.RestApi.Endpoints;
 
 import com.restApi.RestApi.Entities.Transfer;
+import com.restApi.RestApi.Entities.TransferDto;
 import com.restApi.RestApi.Services.TransferService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,8 +23,8 @@ public class TransferEndpoint {
     }
 
     @PostMapping("/transfer/new")
-    public ResponseEntity<Transfer> newTransfer(@RequestBody Transfer transferData) {
-        transferService.createTransfer(transferData);
+    public ResponseEntity<Transfer> newTransfer(@RequestBody TransferDto transferDto) {
+        transferService.createTransfer(transferDto);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -34,15 +35,14 @@ public class TransferEndpoint {
     }
 
     @GetMapping("/transfers/from/{numberAccount}")
-    public ResponseEntity<List<Transfer>> getTransfersByFromNumberAccount(@PathVariable String numberAccount) {
-        List<Transfer> transfers = transferService.getTransfersByFromNumberAccount(numberAccount);
+    public ResponseEntity<List<TransferDto>> getTransfersByFromNumberAccount(@PathVariable String numberAccount) {
+        List<TransferDto> transfers = transferService.getTransfersByFromNumberAccount(numberAccount);
         return new ResponseEntity<>(transfers, HttpStatus.OK);
-
     }
 
     @GetMapping("/transfers/to/{numberAccount}")
-    public ResponseEntity<List<Transfer>> getTransfersByToNumberAccount(@PathVariable String numberAccount) {
-        List<Transfer> transfers = transferService.getTransfersByToNumberAccount(numberAccount);
+    public ResponseEntity<List<TransferDto>> getTransfersByToNumberAccount(@PathVariable String numberAccount) {
+        List<TransferDto> transfers = transferService.getTransfersByToNumberAccount(numberAccount);
         return new ResponseEntity<>(transfers, HttpStatus.OK);
     }
 

@@ -5,9 +5,10 @@ import com.restApi.RestApi.Daos.TransferDao;
 import com.restApi.RestApi.Data.Currency;
 import com.restApi.RestApi.Entities.Account;
 import com.restApi.RestApi.Entities.Transfer;
+import com.restApi.RestApi.Entities.TransferDto;
 import com.restApi.RestApi.Exceptions.account.ReturnMoneyToSourceAccountException;
-import com.restApi.RestApi.Exceptions.account.ReturnTransferByNumberAccountException;
 import com.restApi.RestApi.Exceptions.transfer.NoTransfersException;
+import com.restApi.RestApi.Exceptions.transfer.ReturnTransfersByIdAccountException;
 import com.restApi.RestApi.Exceptions.transfer.SaveNewTransferException;
 import com.restApi.RestApi.StatusTransfer;
 import org.slf4j.Logger;
@@ -20,6 +21,7 @@ import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -42,13 +44,14 @@ public class TransferServiceImpl implements TransferService {
     }
 
     @Override
-    public void createTransfer(Transfer transferData) {
-        accountFrom = accountDaoWithCRUD.getAccountByNumberAccount(transferData.getFromNumberAccount());
-        accountTo = accountDaoWithCRUD.getAccountByNumberAccount(transferData.getToNumberAccount());
-        if (isEnoughMoneyOnSourceAccount(transferData)) {
+    public boolean createTransfer(TransferDto transferDto) {
+        accountFrom = accountDaoWithCRUD.getAccountByNumberAccount(transferDto.getFromNumberAccount());
+        accountTo = accountDaoWithCRUD.getAccountByNumberAccount(transferDto.getToNumberAccount());
+        if (isEnoughMoneyOnSourceAccount(transferDto)) {
             if (accountTo != null) { // czy konto docelowe istnieje
-                saveNewTransfer(transferData);
-                subtractMoneyFromSourceAccount(transferData);
+                saveNewTransfer(transferDto);
+                subtractMoneyFromSourceAccount(transferDto);
+                return true;
             }
         } else {
             log.error("Nie masz wystarczajacej ilosc pieniedzy na koncie!");
@@ -56,23 +59,26 @@ public class TransferServiceImpl implements TransferService {
         throw new SaveNewTransferException("Brak środków na koncie lub konto nie istnieje");
     }
 
-    private boolean isEnoughMoneyOnSourceAccount(Transfer transferData) {
-        return accountFrom.getBalance().subtract(transferData.getBalanceBeforeChangeCurrency()).compareTo(BigDecimal.valueOf(0)) > 0;
+    private boolean isEnoughMoneyOnSourceAccount(TransferDto transferDto) {
+        return accountFrom.getBalance().subtract(transferDto.getBalanceBeforeChangeCurrency()).compareTo(BigDecimal.valueOf(0)) > 0;
     }
 
-    private void subtractMoneyFromSourceAccount(Transfer transferData) {
+    private void subtractMoneyFromSourceAccount(TransferDto transferData) {
         accountFrom.setBalance(accountFrom.getBalance().subtract(transferData.getBalanceBeforeChangeCurrency()));
         accountDaoWithCRUD.save(accountFrom);
     }
 
-    private void saveNewTransfer(Transfer transferData) {
+    private void saveNewTransfer(TransferDto transferData) {
         transferData.setCreateTransferDate(String.valueOf(LocalDateTime.now()));
         transferData.setStatus(StatusTransfer.CREATED.getValue());
         transferBalanceBefore = transferData.getBalanceBeforeChangeCurrency();
         transferData.setCurrencyDestinationAccount(accountTo.getCurrency());
         convertCurrency();
         transferData.setBalanceAfterChangeCurrency(transferBalanceAfter);
-        transferDao.save(transferData);
+
+        // dto to Transfer
+        Transfer transferToSave = convertTransferDtoToTransfer(transferData);
+        transferDao.save(transferToSave);
     }
 
     public void convertCurrency() {
@@ -100,7 +106,7 @@ public class TransferServiceImpl implements TransferService {
         Iterable<Transfer> transfers = transferDao.getTransfersByStatus(StatusTransfer.CREATED.getValue());
         if (transfers != null) {
             transfers.forEach(transfer -> {
-                Account accountDestination = accountDaoWithCRUD.getAccountByNumberAccount(transfer.getToNumberAccount());
+                Account accountDestination = accountDaoWithCRUD.getAccountById(transfer.getToAccount().getId());
                 if (accountDestination != null) {
                     transfer.setStatus(StatusTransfer.DONE.getValue());
                     transfer.setExecuteTransferDate(String.valueOf(LocalDateTime.now()));
@@ -116,7 +122,7 @@ public class TransferServiceImpl implements TransferService {
 
     private boolean returnMoneyToSourceAccount(Transfer transfer) {
         if (transfer.getStatus().equals(StatusTransfer.CREATED.getValue())) {
-            Account accountSource = accountDaoWithCRUD.getAccountByNumberAccount(transfer.getFromNumberAccount());
+            Account accountSource = accountDaoWithCRUD.getAccountById(transfer.getFromAccount().getId());
             if (accountSource != null) {
                 accountSource.setBalance(accountSource.getBalance().add(transfer.getBalanceBeforeChangeCurrency()));
                 accountDaoWithCRUD.save(accountSource);
@@ -132,10 +138,9 @@ public class TransferServiceImpl implements TransferService {
         return false;
     }
 
-
     private void addMoneyToDestinationAccount(Transfer transfer) {
         transferBalanceAfter = transfer.getBalanceAfterChangeCurrency();
-        accountTo = accountDaoWithCRUD.getAccountByNumberAccount(transfer.getToNumberAccount());
+        accountTo = accountDaoWithCRUD.getAccountById(transfer.getToAccount().getId());
         accountTo.setBalance(accountTo.getBalance().add(transferBalanceAfter));
         accountDaoWithCRUD.save(accountTo);
     }
@@ -149,21 +154,25 @@ public class TransferServiceImpl implements TransferService {
     }
 
     @Override
-    public List<Transfer> getTransfersByFromNumberAccount(String numberAccount) {
-        List<Transfer> transfers = transferDao.getTransfersByFromNumberAccount(numberAccount);
+    public List<TransferDto> getTransfersByFromNumberAccount(String numberAccount) {
+        List<Transfer> transfers = transferDao.getTransfersByFromAccountNumberAccount(numberAccount);
+        List<TransferDto> result = convertTransfersToTransfersDto(transfers);
+
         if (transfers.size() == 0) {
-            throw new ReturnTransferByNumberAccountException("Brak transferow z tego konta: " + numberAccount);
+            throw new ReturnTransfersByIdAccountException("Brak transferow z konta o id: " + numberAccount);
         }
-        return transfers;
+        return result;
     }
 
     @Override
-    public List<Transfer> getTransfersByToNumberAccount(String numberAccount) {
-        List<Transfer> transfers = transferDao.getTransfersByToNumberAccount(numberAccount);
+    public List<TransferDto> getTransfersByToNumberAccount(String numberAccount) {
+        List<Transfer> transfers = transferDao.getTransfersByToAccountNumberAccount(numberAccount);
+        List<TransferDto> result = convertTransfersToTransfersDto(transfers);
+
         if (transfers.size() == 0) {
-            throw new ReturnTransferByNumberAccountException("Brak transferow z tego konta: " + numberAccount);
+            throw new ReturnTransfersByIdAccountException("Brak transferow z konta o id: " + numberAccount);
         }
-        return transfers;
+        return result;
     }
 
     @Override
@@ -171,5 +180,35 @@ public class TransferServiceImpl implements TransferService {
         if (!returnMoneyToSourceAccount(transfer)) {
             throw new ReturnMoneyToSourceAccountException("Zwrot pieniędzy na konto źródłowe nie powiódł się");
         }
+    }
+
+    private List<TransferDto> convertTransfersToTransfersDto(List<Transfer> transfers) {
+        List<TransferDto> transferDtos = new ArrayList<>();
+        for (Transfer transfer: transfers
+             ) {
+            TransferDto transferDto = new TransferDto();
+            transferDto.setToNumberAccount(transfer.getToAccount().getNumberAccount());
+            transferDto.setFromNumberAccount(transfer.getFromAccount().getNumberAccount());
+            transferDto.setCreateTransferDate(transfer.getCreateTransferDate());
+            transferDto.setExecuteTransferDate(transfer.getExecuteTransferDate());
+            transferDto.setStatus(transfer.getStatus());
+            transferDto.setCurrencyDestinationAccount(transfer.getCurrencyDestinationAccount());
+            transferDto.setBalanceBeforeChangeCurrency(transfer.getBalanceBeforeChangeCurrency());
+            transferDto.setBalanceAfterChangeCurrency(transfer.getBalanceAfterChangeCurrency());
+            transferDtos.add(transferDto);
+        }
+        return transferDtos;
+    }
+
+    private Transfer convertTransferDtoToTransfer(TransferDto transferData) {
+        Transfer transferToSave = new Transfer();
+        transferToSave.setFromAccount(accountFrom);
+        transferToSave.setToAccount(accountTo);
+        transferToSave.setStatus(transferData.getStatus());
+        transferToSave.setCurrencyDestinationAccount(transferData.getCurrencyDestinationAccount());
+        transferToSave.setBalanceBeforeChangeCurrency(transferData.getBalanceBeforeChangeCurrency());
+        transferToSave.setBalanceAfterChangeCurrency(transferData.getBalanceAfterChangeCurrency());
+        transferToSave.setCreateTransferDate(transferData.getCreateTransferDate());
+        return transferToSave;
     }
 }

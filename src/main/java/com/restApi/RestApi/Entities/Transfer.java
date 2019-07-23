@@ -18,8 +18,10 @@ public class Transfer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private String fromNumberAccount;
-    private String toNumberAccount;
+    @ManyToOne(targetEntity = Account.class)
+    private Account fromAccount;
+    @ManyToOne(targetEntity = Account.class)
+    private Account toAccount;
     @Min(0)
     private BigDecimal balanceAfterChangeCurrency;
 

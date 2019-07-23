@@ -26,7 +26,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account getAccountByIdAccount(int accountId) {
-        Account account = accountDaoWithCRUD.getAccountsById(accountId);
+        Account account = accountDaoWithCRUD.getAccountById(accountId);
         if (account == null) {
             throw new AccountByIdAccountNotExistException("Konto o podanym id:" + accountId + " nie istnieje");
         }
@@ -46,7 +46,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account changeNameAccountByIdAccount(int accountId, Account account) {
-        Account accountToChange = accountDaoWithCRUD.getAccountsById(accountId);
+        Account accountToChange = accountDaoWithCRUD.getAccountById(accountId);
 
         if (accountToChange != null) {
             setNewNameToAccount(accountToChange, account.getName());
@@ -66,7 +66,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public void deleteAccountByIdAccount(int accountId) {
-        if (accountDaoWithCRUD.getAccountsById(accountId) != null) {
+        if (accountDaoWithCRUD.getAccountById(accountId) != null) {
             accountDaoWithCRUD.deleteAccountsById(accountId);
         } else {
             throw new AccountByIdAccountNotExistException("Konto o podanym id:" + accountId + " nie istnieje");

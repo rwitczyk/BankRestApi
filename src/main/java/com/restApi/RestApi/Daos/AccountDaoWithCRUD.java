@@ -5,7 +5,7 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface AccountDaoWithCRUD extends CrudRepository<Account, Integer> {
 
-    Account getAccountsById(int id);
+    Account getAccountById(int id);
 
     Account getAccountByNumberAccount(String numberAccount);
 
