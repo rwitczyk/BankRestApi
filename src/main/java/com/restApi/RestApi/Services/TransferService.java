@@ -1,6 +1,7 @@
 package com.restApi.RestApi.Services;
 
 
+import com.restApi.RestApi.Entities.Account;
 import com.restApi.RestApi.Entities.Transfer;
 import com.restApi.RestApi.Entities.TransferDto;
 
@@ -8,7 +9,11 @@ import java.util.List;
 
 public interface TransferService {
 
-    boolean createTransfer(TransferDto transferdto);
+    boolean createTransfer(TransferDto transferDto, Account accountFrom);
+
+    void createExteriorTransfer(TransferDto transferDto, Account accountFrom);
+
+    void chooseTransfer(TransferDto transferDto);
 
     Iterable<Transfer> getAllTransfers();
 

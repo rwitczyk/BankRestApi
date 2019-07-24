@@ -29,6 +29,7 @@ public class Transfer {
     private BigDecimal balanceBeforeChangeCurrency;
 
     private String currencyDestinationAccount;
+    private String currencyFromAccount;
     private String createTransferDate;
     private String executeTransferDate;
     private String status;

@@ -1,12 +1,13 @@
 package com.restApi.RestApi.Services;
 
+import com.restApi.RestApi.Converters.ClassConverter;
 import com.restApi.RestApi.Daos.AccountDaoWithCRUD;
+import com.restApi.RestApi.Daos.ExternalTransferDao;
 import com.restApi.RestApi.Daos.TransferDao;
 import com.restApi.RestApi.Data.Currency;
-import com.restApi.RestApi.Entities.Account;
-import com.restApi.RestApi.Entities.Transfer;
-import com.restApi.RestApi.Entities.TransferDto;
+import com.restApi.RestApi.Entities.*;
 import com.restApi.RestApi.Exceptions.account.ReturnMoneyToSourceAccountException;
+import com.restApi.RestApi.Exceptions.transfer.ExternalTransferException;
 import com.restApi.RestApi.Exceptions.transfer.NoTransfersException;
 import com.restApi.RestApi.Exceptions.transfer.ReturnTransfersByIdAccountException;
 import com.restApi.RestApi.Exceptions.transfer.SaveNewTransferException;
@@ -14,6 +15,8 @@ import com.restApi.RestApi.StatusTransfer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -21,36 +24,35 @@ import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
 
 @Service
 @Transactional
 public class TransferServiceImpl implements TransferService {
 
     private TransferDao transferDao;
+    private ExternalTransferDao externalTransferDao;
     private AccountDaoWithCRUD accountDaoWithCRUD;
+    private ClassConverter classConverter = new ClassConverter();
     private static final Logger log = LoggerFactory.getLogger(TransferServiceImpl.class);
-    private Account accountFrom;
-    private Account accountTo;
-    private BigDecimal transferBalanceBefore;
-    private BigDecimal transferBalanceAfter;
 
     @Autowired
-    public TransferServiceImpl(TransferDao transferDao, AccountDaoWithCRUD accountDaoWithCRUD) {
+    public TransferServiceImpl(TransferDao transferDao, AccountDaoWithCRUD accountDaoWithCRUD, ExternalTransferDao externalTransferDao) {
         this.transferDao = transferDao;
         this.accountDaoWithCRUD = accountDaoWithCRUD;
+        this.externalTransferDao = externalTransferDao;
     }
 
     @Override
-    public boolean createTransfer(TransferDto transferDto) {
-        accountFrom = accountDaoWithCRUD.getAccountByNumberAccount(transferDto.getFromNumberAccount());
-        accountTo = accountDaoWithCRUD.getAccountByNumberAccount(transferDto.getToNumberAccount());
-        if (isEnoughMoneyOnSourceAccount(transferDto)) {
-            if (accountTo != null) { // czy konto docelowe istnieje
-                saveNewTransfer(transferDto);
-                subtractMoneyFromSourceAccount(transferDto);
+    public boolean createTransfer(TransferDto transferDto, Account accountFrom) {
+        Account accountTo = accountDaoWithCRUD.getAccountByNumberAccount(transferDto.getToNumberAccount());
+        transferDto.setCurrencyFromAccount(accountFrom.getCurrency());
+        if (isEnoughMoneyOnSourceAccount(transferDto, accountFrom)) {
+            if (accountTo != null) {
+                saveNewTransfer(transferDto, accountFrom, accountTo);
+                subtractMoneyFromSourceAccount(transferDto, accountFrom);
                 return true;
             }
         } else {
@@ -59,46 +61,77 @@ public class TransferServiceImpl implements TransferService {
         throw new SaveNewTransferException("Brak środków na koncie lub konto nie istnieje");
     }
 
-    private boolean isEnoughMoneyOnSourceAccount(TransferDto transferDto) {
+    @Override
+    public void chooseTransfer(TransferDto transferDto) {
+        Account accountFrom = accountDaoWithCRUD.getAccountByNumberAccount(transferDto.getFromNumberAccount());
+        transferDto.setCurrencyFromAccount(accountFrom.getCurrency());
+
+        if (transferDto.getTransferToBank() == 0) { // wewnetrzny
+            createTransfer(transferDto, accountFrom);
+        } else if (transferDto.getTransferToBank() == 1) { // zewnetrzny
+            createExteriorTransfer(transferDto, accountFrom);
+        }
+    }
+
+    @Override
+    public void createExteriorTransfer(TransferDto transferDto, Account accountFrom) {
+
+        if (isEnoughMoneyOnSourceAccount(transferDto, accountFrom)) {
+            ExternalTransferDto externalTransferDto = classConverter.convertTransferDtoToExternalTransferDto(transferDto);
+            RestTemplate rest = new RestTemplate();
+            final String urlApiArek = "https://comarch.herokuapp.com/";
+            ResponseEntity<String> postTransfer = rest.postForEntity(urlApiArek + "transfer/external-transfer", externalTransferDto, String.class);
+
+            System.out.println("WYSLANO PRZELEW DO ARKA");
+            if (postTransfer.getStatusCode() == HttpStatus.OK) {
+                System.out.println("STATUS OK");
+                subtractMoneyFromSourceAccount(transferDto, accountFrom);
+                ExternalTransfer externalTransfer = classConverter.convertTransferDtoToExternalTransfer(transferDto, accountFrom);
+                externalTransferDao.save(externalTransfer);
+            } else {
+                throw new ExternalTransferException("Transfer zewnetrzny nie powiódł się!");
+            }
+        } else {
+            throw new SaveNewTransferException("Brak środków na koncie lub konto nie istnieje");
+        }
+    }
+
+    private boolean isEnoughMoneyOnSourceAccount(TransferDto transferDto, Account accountFrom) {
         return accountFrom.getBalance().subtract(transferDto.getBalanceBeforeChangeCurrency()).compareTo(BigDecimal.valueOf(0)) > 0;
     }
 
-    private void subtractMoneyFromSourceAccount(TransferDto transferData) {
+    private void subtractMoneyFromSourceAccount(TransferDto transferData, Account accountFrom) {
         accountFrom.setBalance(accountFrom.getBalance().subtract(transferData.getBalanceBeforeChangeCurrency()));
         accountDaoWithCRUD.save(accountFrom);
     }
 
-    private void saveNewTransfer(TransferDto transferData) {
+    private void saveNewTransfer(TransferDto transferData, Account accountFrom, Account accountTo) {
         transferData.setCreateTransferDate(String.valueOf(LocalDateTime.now()));
         transferData.setStatus(StatusTransfer.CREATED.getValue());
-        transferBalanceBefore = transferData.getBalanceBeforeChangeCurrency();
         transferData.setCurrencyDestinationAccount(accountTo.getCurrency());
-        convertCurrency();
+
+        BigDecimal multiplyCurrency = convertCurrency(accountFrom.getCurrency(), accountTo.getCurrency());
+        BigDecimal transferBalanceAfter = transferData.getBalanceBeforeChangeCurrency().multiply(multiplyCurrency);
+        transferBalanceAfter = transferBalanceAfter.setScale(2, RoundingMode.CEILING);
         transferData.setBalanceAfterChangeCurrency(transferBalanceAfter);
 
-        // dto to Transfer
-        Transfer transferToSave = convertTransferDtoToTransfer(transferData);
+        Transfer transferToSave = classConverter.convertTransferDtoToTransfer(transferData, accountFrom, accountTo);
         transferDao.save(transferToSave);
     }
 
-    public void convertCurrency() {
+    public BigDecimal convertCurrency(String currencyFrom, String currencyTo) {
+        BigDecimal multiplyCurrency;
         RestTemplate restTemplate = new RestTemplate();
         String currencyApiUrl = "https://api.exchangeratesapi.io/latest?base=";
-        String currencyFrom = accountFrom.getCurrency();
-        String currencyTo = accountTo.getCurrency();
 
         if (!currencyFrom.equals(currencyTo)) { // czy waluty sa rozne od siebie
-
             Currency currency = restTemplate.getForObject(currencyApiUrl + currencyFrom, Currency.class);
-
-            BigDecimal multiplyCurrency = Objects.requireNonNull(currency, "Currency nie moze byc null!").getRates().get(currencyTo);
+            multiplyCurrency = Objects.requireNonNull(currency, "Currency nie moze byc null!").getRates().get(currencyTo);
             log.info("Mnoznik waluty: " + multiplyCurrency);
-
-            transferBalanceAfter = transferBalanceBefore.multiply(multiplyCurrency);
-            transferBalanceAfter = transferBalanceAfter.setScale(2, RoundingMode.CEILING);
         } else {
-            transferBalanceAfter = transferBalanceBefore;
+            return BigDecimal.valueOf(1);
         }
+        return multiplyCurrency;
     }
 
     public void finishTransfers() {
@@ -112,7 +145,7 @@ public class TransferServiceImpl implements TransferService {
                     transfer.setExecuteTransferDate(String.valueOf(LocalDateTime.now()));
                     transferDao.save(transfer);
 
-                    addMoneyToDestinationAccount(transfer);
+                    addMoneyToDestinationAccount(transfer, accountDestination);
                 } else {
                     returnMoneyToSourceAccount(transfer);
                 }
@@ -138,9 +171,8 @@ public class TransferServiceImpl implements TransferService {
         return false;
     }
 
-    private void addMoneyToDestinationAccount(Transfer transfer) {
-        transferBalanceAfter = transfer.getBalanceAfterChangeCurrency();
-        accountTo = accountDaoWithCRUD.getAccountById(transfer.getToAccount().getId());
+    private void addMoneyToDestinationAccount(Transfer transfer, Account accountTo) {
+        BigDecimal transferBalanceAfter = transfer.getBalanceAfterChangeCurrency();
         accountTo.setBalance(accountTo.getBalance().add(transferBalanceAfter));
         accountDaoWithCRUD.save(accountTo);
     }
@@ -156,7 +188,7 @@ public class TransferServiceImpl implements TransferService {
     @Override
     public List<TransferDto> getTransfersByFromNumberAccount(String numberAccount) {
         List<Transfer> transfers = transferDao.getTransfersByFromAccountNumberAccount(numberAccount);
-        List<TransferDto> result = convertTransfersToTransfersDto(transfers);
+        List<TransferDto> result = classConverter.convertTransfersToTransfersDto(transfers);
 
         if (transfers.size() == 0) {
             throw new ReturnTransfersByIdAccountException("Brak transferow z konta o id: " + numberAccount);
@@ -167,7 +199,7 @@ public class TransferServiceImpl implements TransferService {
     @Override
     public List<TransferDto> getTransfersByToNumberAccount(String numberAccount) {
         List<Transfer> transfers = transferDao.getTransfersByToAccountNumberAccount(numberAccount);
-        List<TransferDto> result = convertTransfersToTransfersDto(transfers);
+        List<TransferDto> result = classConverter.convertTransfersToTransfersDto(transfers);
 
         if (transfers.size() == 0) {
             throw new ReturnTransfersByIdAccountException("Brak transferow z konta o id: " + numberAccount);
@@ -184,35 +216,4 @@ public class TransferServiceImpl implements TransferService {
         }
     }
 
-    private List<TransferDto> convertTransfersToTransfersDto(List<Transfer> transfers) {
-        List<TransferDto> transferDtos = new ArrayList<>();
-        for (Transfer transfer: transfers
-             ) {
-            TransferDto transferDto = new TransferDto();
-            transferDto.setId(transfer.getId());
-            transferDto.setToNumberAccount(transfer.getToAccount().getNumberAccount());
-            transferDto.setFromNumberAccount(transfer.getFromAccount().getNumberAccount());
-            transferDto.setCreateTransferDate(transfer.getCreateTransferDate());
-            transferDto.setExecuteTransferDate(transfer.getExecuteTransferDate());
-            transferDto.setStatus(transfer.getStatus());
-            transferDto.setCurrencyDestinationAccount(transfer.getCurrencyDestinationAccount());
-            transferDto.setBalanceBeforeChangeCurrency(transfer.getBalanceBeforeChangeCurrency());
-            transferDto.setBalanceAfterChangeCurrency(transfer.getBalanceAfterChangeCurrency());
-            transferDtos.add(transferDto);
-        }
-        return transferDtos;
-    }
-
-    private Transfer convertTransferDtoToTransfer(TransferDto transferData) {
-        Transfer transferToSave = new Transfer();
-        transferToSave.setId(transferData.getId());
-        transferToSave.setFromAccount(accountFrom);
-        transferToSave.setToAccount(accountTo);
-        transferToSave.setStatus(transferData.getStatus());
-        transferToSave.setCurrencyDestinationAccount(transferData.getCurrencyDestinationAccount());
-        transferToSave.setBalanceBeforeChangeCurrency(transferData.getBalanceBeforeChangeCurrency());
-        transferToSave.setBalanceAfterChangeCurrency(transferData.getBalanceAfterChangeCurrency());
-        transferToSave.setCreateTransferDate(transferData.getCreateTransferDate());
-        return transferToSave;
-    }
 }

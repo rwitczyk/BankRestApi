@@ -11,6 +11,8 @@ public class TransferDto {
     BigDecimal balanceAfterChangeCurrency;
     String createTransferDate;
     String currencyDestinationAccount;
+    String currencyFromAccount;
+    int transferToBank;
     String executeTransferDate;
     String fromNumberAccount;
     String toNumberAccount;
