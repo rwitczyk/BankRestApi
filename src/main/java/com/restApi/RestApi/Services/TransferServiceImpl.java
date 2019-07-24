@@ -176,7 +176,9 @@ public class TransferServiceImpl implements TransferService {
     }
 
     @Override
-    public void cancelTransfer(Transfer transfer) {
+    public void cancelTransfer(TransferDto transferDto) {
+        Transfer transfer = transferDao.getTransferById(transferDto.getId());
+
         if (!returnMoneyToSourceAccount(transfer)) {
             throw new ReturnMoneyToSourceAccountException("Zwrot pieniędzy na konto źródłowe nie powiódł się");
         }
@@ -187,6 +189,7 @@ public class TransferServiceImpl implements TransferService {
         for (Transfer transfer: transfers
              ) {
             TransferDto transferDto = new TransferDto();
+            transferDto.setId(transfer.getId());
             transferDto.setToNumberAccount(transfer.getToAccount().getNumberAccount());
             transferDto.setFromNumberAccount(transfer.getFromAccount().getNumberAccount());
             transferDto.setCreateTransferDate(transfer.getCreateTransferDate());
@@ -202,6 +205,7 @@ public class TransferServiceImpl implements TransferService {
 
     private Transfer convertTransferDtoToTransfer(TransferDto transferData) {
         Transfer transferToSave = new Transfer();
+        transferToSave.setId(transferData.getId());
         transferToSave.setFromAccount(accountFrom);
         transferToSave.setToAccount(accountTo);
         transferToSave.setStatus(transferData.getStatus());

@@ -12,4 +12,6 @@ public interface TransferDao extends CrudRepository<Transfer, Integer> {
     List<Transfer> getTransfersByFromAccountNumberAccount(String numberAccount);
 
     List<Transfer> getTransfersByStatus(String status);
+
+    Transfer getTransferById(int id);
 }

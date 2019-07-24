@@ -47,8 +47,8 @@ public class TransferEndpoint {
     }
 
     @PostMapping("/transfers/cancel")
-    public ResponseEntity cancelTransfer(@RequestBody Transfer transfer) {
-        transferService.cancelTransfer(transfer);
+    public ResponseEntity cancelTransfer(@RequestBody TransferDto transferDto) {
+        transferService.cancelTransfer(transferDto);
         return new ResponseEntity(HttpStatus.OK);
     }
 }
