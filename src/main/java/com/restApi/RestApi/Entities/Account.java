@@ -19,7 +19,7 @@ public class Account {
     private int id;
 
     @Column(name = "numberAccount") // nazwa ktora bedzie w bazce w tabeli
-    @Size(min = 4,max = 4)
+    @Size(min = 26,max = 26)
     private String numberAccount;
 
     @Column(name = "currency")
@@ -32,7 +32,7 @@ public class Account {
     @Min(0)
     private BigDecimal balance;
 
-    public Account(@Size(min = 4, max = 4) String numberAccount, String currency, String name, @Min(0) BigDecimal balance) {
+    public Account(@Size(min = 26, max = 26) String numberAccount, String currency, String name, @Min(0) BigDecimal balance) {
         this.numberAccount = numberAccount;
         this.currency = currency;
         this.name = name;
