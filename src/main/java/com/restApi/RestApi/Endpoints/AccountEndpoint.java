@@ -13,7 +13,7 @@ import java.util.List;
 
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/api")
+@RequestMapping(value = "/api", produces = "application/json")
 public class AccountEndpoint {
 
     private AccountService accountService;
@@ -25,7 +25,7 @@ public class AccountEndpoint {
         this.accountDao = accountDao;
     }
 
-    @GetMapping("accounts")
+    @GetMapping("/accounts")
     public ResponseEntity<List<Account>> getAllAccounts() {
         return new ResponseEntity<>(accountDao.getAllAccounts(), HttpStatus.OK);
     }
