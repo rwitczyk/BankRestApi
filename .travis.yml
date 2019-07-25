@@ -18,6 +18,6 @@ deploy:
   provider: heroku
   api_key:
     secure: "24888aae-436e-4326-96a3-1f6bb6d0fe21"
-  app: calm-chamber-25826
+  app: bankrobloxback
   on:
     repo: rwitczyk/BankRestApi
