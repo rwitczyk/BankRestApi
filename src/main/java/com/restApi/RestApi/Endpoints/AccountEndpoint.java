@@ -26,8 +26,8 @@ public class AccountEndpoint {
     }
 
     @GetMapping("accounts")
-    public List<Account> getAllAccounts() {
-        return accountDao.getAllAccounts();
+    public ResponseEntity<List<Account>> getAllAccounts() {
+        return new ResponseEntity<>(accountDao.getAllAccounts(), HttpStatus.OK);
     }
 
     @GetMapping("accounts/number/{numberAccount}")
