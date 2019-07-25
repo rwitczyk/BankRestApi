@@ -1,6 +1,7 @@
 package com.restApi.RestApi.Endpoints;
 
 import com.restApi.RestApi.Daos.AccountDao;
+import com.restApi.RestApi.Data.UserMagda;
 import com.restApi.RestApi.Entities.Account;
 import com.restApi.RestApi.Services.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,5 +58,11 @@ public class AccountEndpoint {
     public ResponseEntity deleteAccount(@PathVariable int idAccount) {
         accountService.deleteAccountByIdAccount(idAccount);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("accounts/magda")
+    public ResponseEntity getAccountsFromMagda() {
+        UserMagda[] users = accountService.getUsersFromMagda();
+        return new ResponseEntity<>(users,HttpStatus.OK);
     }
 }

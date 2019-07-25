@@ -1,5 +1,6 @@
 package com.restApi.RestApi.Services;
 
+import com.restApi.RestApi.Data.UserMagda;
 import com.restApi.RestApi.Entities.Account;
 
 public interface AccountService {
@@ -15,4 +16,6 @@ public interface AccountService {
     void deleteAccountByIdAccount(int accountId);
 
     void addAccount(Account account);
+
+    UserMagda[] getUsersFromMagda();
 }

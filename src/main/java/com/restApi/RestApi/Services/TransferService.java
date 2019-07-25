@@ -24,4 +24,6 @@ public interface TransferService {
     List<TransferDto> getTransfersByToNumberAccount(String numberAccount);
 
     void cancelTransfer(TransferDto transferDto);
+
+    boolean isEnoughMoneyOnSourceAccount(TransferDto transferDto, Account accountFrom);
 }

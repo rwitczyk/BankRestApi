@@ -46,6 +46,18 @@ public class TransferServiceImpl implements TransferService {
     }
 
     @Override
+    public void chooseTransfer(TransferDto transferDto) {
+        Account accountFrom = accountDaoWithCRUD.getAccountByNumberAccount(transferDto.getFromNumberAccount());
+        transferDto.setCurrencyFromAccount(accountFrom.getCurrency());
+
+        if (transferDto.getTransferToBank() == 0) { // wewnetrzny
+            createTransfer(transferDto, accountFrom);
+        } else if (transferDto.getTransferToBank() == 1) { // zewnetrzny
+            createExteriorTransfer(transferDto, accountFrom);
+        }
+    }
+
+    @Override
     public boolean createTransfer(TransferDto transferDto, Account accountFrom) {
         Account accountTo = accountDaoWithCRUD.getAccountByNumberAccount(transferDto.getToNumberAccount());
         transferDto.setCurrencyFromAccount(accountFrom.getCurrency());
@@ -62,20 +74,7 @@ public class TransferServiceImpl implements TransferService {
     }
 
     @Override
-    public void chooseTransfer(TransferDto transferDto) {
-        Account accountFrom = accountDaoWithCRUD.getAccountByNumberAccount(transferDto.getFromNumberAccount());
-        transferDto.setCurrencyFromAccount(accountFrom.getCurrency());
-
-        if (transferDto.getTransferToBank() == 0) { // wewnetrzny
-            createTransfer(transferDto, accountFrom);
-        } else if (transferDto.getTransferToBank() == 1) { // zewnetrzny
-            createExteriorTransfer(transferDto, accountFrom);
-        }
-    }
-
-    @Override
     public void createExteriorTransfer(TransferDto transferDto, Account accountFrom) {
-
         if (isEnoughMoneyOnSourceAccount(transferDto, accountFrom)) {
             ExternalTransferDto externalTransferDto = classConverter.convertTransferDtoToExternalTransferDto(transferDto);
             RestTemplate rest = new RestTemplate();
@@ -96,7 +95,7 @@ public class TransferServiceImpl implements TransferService {
         }
     }
 
-    private boolean isEnoughMoneyOnSourceAccount(TransferDto transferDto, Account accountFrom) {
+    public boolean isEnoughMoneyOnSourceAccount(TransferDto transferDto, Account accountFrom) {
         return accountFrom.getBalance().subtract(transferDto.getBalanceBeforeChangeCurrency()).compareTo(BigDecimal.valueOf(0)) > 0;
     }
 
@@ -215,5 +214,4 @@ public class TransferServiceImpl implements TransferService {
             throw new ReturnMoneyToSourceAccountException("Zwrot pieniędzy na konto źródłowe nie powiódł się");
         }
     }
-
 }

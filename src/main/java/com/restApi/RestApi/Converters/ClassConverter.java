@@ -42,7 +42,7 @@ public class ClassConverter {
     public ExternalTransferDto convertTransferDtoToExternalTransferDto(TransferDto transferDto) {
         ExternalTransferDto externalTransferDto = new ExternalTransferDto();
         externalTransferDto.setAmount(transferDto.getBalanceBeforeChangeCurrency().toString());
-        externalTransferDto.setBankName("Robert 44");
+        externalTransferDto.setBankName("Robert44");
         externalTransferDto.setCurrency("PLN");
         externalTransferDto.setExternalAccount(transferDto.getFromNumberAccount());
         externalTransferDto.setToAccount(transferDto.getToNumberAccount());
