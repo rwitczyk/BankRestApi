@@ -19,7 +19,6 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity.cors().and().csrf().disable()
                 .authorizeRequests().anyRequest().authenticated()
                 .and().httpBasic();
-
     }
 
     @Autowired
