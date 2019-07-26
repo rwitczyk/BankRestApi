@@ -8,6 +8,7 @@ import com.restApi.RestApi.Entities.TransferDto;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.springframework.mail.javamail.JavaMailSender;
 
 import java.math.BigDecimal;
 
@@ -18,8 +19,10 @@ public class TransferServiceImplTest {
     AccountDaoWithCRUD accountDaoWithCRUD;
     @Mock
     ExternalTransferDao externalTransferDao;
+    @Mock
+    JavaMailSender javaMailSender;
 
-    private TransferService transferService = new TransferServiceImpl(transferDao,accountDaoWithCRUD,externalTransferDao);
+    private TransferService transferService = new TransferServiceImpl(transferDao,accountDaoWithCRUD,externalTransferDao,javaMailSender);
 
     @Test
     public void checkIsEnoughMoneyOnSourceAccountCorrectly() {
