@@ -17,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -35,14 +37,17 @@ public class TransferServiceImpl implements TransferService {
     private TransferDao transferDao;
     private ExternalTransferDao externalTransferDao;
     private AccountDaoWithCRUD accountDaoWithCRUD;
+    private JavaMailSender javaMailSender;
     private ClassConverter classConverter = new ClassConverter();
     private static final Logger log = LoggerFactory.getLogger(TransferServiceImpl.class);
 
     @Autowired
-    public TransferServiceImpl(TransferDao transferDao, AccountDaoWithCRUD accountDaoWithCRUD, ExternalTransferDao externalTransferDao) {
+    public TransferServiceImpl(TransferDao transferDao, AccountDaoWithCRUD accountDaoWithCRUD,
+                               ExternalTransferDao externalTransferDao, JavaMailSender javaMailSender) {
         this.transferDao = transferDao;
         this.accountDaoWithCRUD = accountDaoWithCRUD;
         this.externalTransferDao = externalTransferDao;
+        this.javaMailSender = javaMailSender;
     }
 
     @Override
@@ -83,6 +88,10 @@ public class TransferServiceImpl implements TransferService {
 
             System.out.println("WYSLANO PRZELEW DO ARKA");
             if (postTransfer.getStatusCode() == HttpStatus.OK) {
+                if(transferDto.getEmail().length() > 2)
+                {
+                    sendEmail(transferDto);
+                }
                 System.out.println("STATUS OK");
                 subtractMoneyFromSourceAccount(transferDto, accountFrom);
                 ExternalTransfer externalTransfer = classConverter.convertTransferDtoToExternalTransfer(transferDto, accountFrom);
@@ -93,6 +102,20 @@ public class TransferServiceImpl implements TransferService {
         } else {
             throw new SaveNewTransferException("Brak środków na koncie lub konto nie istnieje");
         }
+    }
+
+    void sendEmail(TransferDto transferDto) {
+
+        SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setTo(transferDto.getEmail() + "@gmail.com");
+
+        msg.setSubject("Wykonano przelew!");
+        msg.setText("Bank Roblox \n" +
+                "Zlecono przelew z konta: " + transferDto.getFromNumberAccount() + " na kwotę: " +
+                transferDto.getBalanceAfterChangeCurrency() + transferDto.getCurrencyDestinationAccount() + " na numer" +
+                "konta: " + transferDto.getToNumberAccount());
+        javaMailSender.send(msg);
+
     }
 
     public boolean isEnoughMoneyOnSourceAccount(TransferDto transferDto, Account accountFrom) {

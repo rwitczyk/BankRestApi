@@ -13,6 +13,7 @@ public class TransferDto {
     String currencyDestinationAccount;
     String currencyFromAccount;
     int transferToBank;
+    String email;
     String executeTransferDate;
     String fromNumberAccount;
     String toNumberAccount;
