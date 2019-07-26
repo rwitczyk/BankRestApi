@@ -111,7 +111,7 @@ public class TransferServiceImpl implements TransferService {
         msg.setSubject("Wykonano przelew!");
         msg.setText("Bank Roblox \n" +
                 "Zlecono przelew z konta: " + transferDto.getFromNumberAccount() + " na kwotę: " +
-                transferDto.getBalanceAfterChangeCurrency() + transferDto.getCurrencyDestinationAccount() + " na numer" +
+                transferDto.getBalanceBeforeChangeCurrency() + transferDto.getCurrencyFromAccount() + " na numer" +
                 "konta: " + transferDto.getToNumberAccount());
         javaMailSender.send(msg);
 
