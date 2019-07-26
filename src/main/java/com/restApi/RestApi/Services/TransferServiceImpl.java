@@ -107,7 +107,7 @@ public class TransferServiceImpl implements TransferService {
     void sendEmail(TransferDto transferDto) {
 
         SimpleMailMessage msg = new SimpleMailMessage();
-        msg.setTo(transferDto.getEmail() + "@gmail.com");
+        msg.setTo(transferDto.getEmail());
         msg.setSubject("Wykonano przelew!");
         msg.setText("Bank Roblox \n" +
                 "Zlecono przelew z konta: " + transferDto.getFromNumberAccount() + " na kwotę: " +
