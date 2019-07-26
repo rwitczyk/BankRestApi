@@ -25,7 +25,7 @@ public class AccountEndpoint {
         this.accountDao = accountDao;
     }
 
-    @GetMapping("/accounts")
+    @GetMapping("accounts")
     public ResponseEntity<List<Account>> getAllAccounts() {
         return new ResponseEntity<>(accountDao.getAllAccounts(), HttpStatus.OK);
     }
