@@ -192,8 +192,7 @@ public class TransferServiceImpl implements TransferService {
     }
 
     private void addMoneyToDestinationAccount(Transfer transfer, Account accountTo) {
-        BigDecimal transferBalanceAfter = transfer.getBalanceAfterChangeCurrency();
-        accountTo.setBalance(accountTo.getBalance().add(transferBalanceAfter));
+        accountTo.setBalance(accountTo.getBalance().add(transfer.getBalanceAfterChangeCurrency()));
         accountDaoWithCRUD.save(accountTo);
     }
 

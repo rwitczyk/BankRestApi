@@ -8,9 +8,10 @@ import com.restApi.RestApi.Exceptions.account.AccountByNumberAccountNotExistExce
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.math.BigDecimal;
+
+import static org.mockito.Mockito.*;
 
 public class AccountServiceImplTest {
 
@@ -20,8 +21,8 @@ public class AccountServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        accountDao = Mockito.mock(AccountDao.class);
-        accountDaoWithCRUD = Mockito.mock(AccountDaoWithCRUD.class);
+        accountDao = mock(AccountDao.class);
+        accountDaoWithCRUD = mock(AccountDaoWithCRUD.class);
         accountService = new AccountServiceImpl(accountDao, accountDaoWithCRUD);
     }
 
@@ -33,7 +34,7 @@ public class AccountServiceImplTest {
         Account accountResult = new Account("2222", "PLN", "Janusz", BigDecimal.valueOf(100));
 
         // when
-        Mockito.when(accountDaoWithCRUD.getAccountById(Mockito.anyInt())).thenReturn(accountToChange);
+        when(accountDaoWithCRUD.getAccountById(anyInt())).thenReturn(accountToChange);
         accountService.changeNameAccountByIdAccount(3, name);
 
         // then

@@ -51,18 +51,12 @@ public class AccountServiceImpl implements AccountService {
         Account accountToChange = accountDaoWithCRUD.getAccountById(accountId);
 
         if (accountToChange != null) {
-            setNewNameToAccount(accountToChange, newName);
+            accountToChange.setName(newName);
             accountDaoWithCRUD.save(accountToChange);
             return accountToChange;
         } else {
             throw new AccountByIdAccountNotExistException("Konto o podanym id:" + accountId + " nie istnieje");
         }
-    }
-
-    private Account setNewNameToAccount(Account accountToChange, String name) {
-        accountToChange.setName(name);
-
-        return accountToChange;
     }
 
     @Override
