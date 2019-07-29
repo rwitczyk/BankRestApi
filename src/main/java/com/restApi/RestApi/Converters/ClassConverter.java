@@ -12,6 +12,7 @@ public class ClassConverter {
         for (Transfer transfer : transfers
         ) {
             TransferDto transferDto = TransferDto.builder()
+                    .id(transfer.getId())
                     .toNumberAccount(transfer.getToAccount().getNumberAccount())
                     .fromNumberAccount(transfer.getFromAccount().getNumberAccount())
                     .createTransferDate(transfer.getCreateTransferDate())
