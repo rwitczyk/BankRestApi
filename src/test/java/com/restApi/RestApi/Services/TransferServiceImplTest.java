@@ -5,42 +5,52 @@ import com.restApi.RestApi.Daos.ExternalTransferDao;
 import com.restApi.RestApi.Daos.TransferDao;
 import com.restApi.RestApi.Entities.Account;
 import com.restApi.RestApi.Entities.TransferDto;
-import org.junit.Assert;
+import com.restApi.RestApi.Exceptions.transfer.SaveNewTransferException;
+import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import java.math.BigDecimal;
 
+import static org.mockito.Mockito.mock;
+
 public class TransferServiceImplTest {
-    @Mock
-    TransferDao transferDao;
-    @Mock
-    AccountDaoWithCRUD accountDaoWithCRUD;
-    @Mock
-    ExternalTransferDao externalTransferDao;
-    @Mock
-    JavaMailSender javaMailSender;
+    private TransferDao transferDao;
+    private AccountDaoWithCRUD accountDaoWithCRUD;
+    private ExternalTransferDao externalTransferDao;
+    private JavaMailSender javaMailSender;
+    private TransferService transferService;
 
-    private TransferService transferService = new TransferServiceImpl(transferDao,accountDaoWithCRUD,externalTransferDao,javaMailSender);
-
-    @Test
-    public void checkIsEnoughMoneyOnSourceAccountCorrectly() {
-        TransferDto transferDto = new TransferDto();
-        transferDto.setBalanceBeforeChangeCurrency(BigDecimal.valueOf(1000));
-
-        Account accountFrom = new Account();
-        accountFrom.setBalance(BigDecimal.valueOf(1111));
-        Assert.assertTrue(transferService.isEnoughMoneyOnSourceAccount(transferDto, accountFrom));
+    @Before
+    public void setUp() throws Exception {
+        javaMailSender = mock(JavaMailSender.class);
+        accountDaoWithCRUD = mock(AccountDaoWithCRUD.class);
+        transferDao = mock(TransferDao.class);
+        externalTransferDao = mock(ExternalTransferDao.class);
+        transferService = new TransferServiceImpl(transferDao, accountDaoWithCRUD, externalTransferDao, javaMailSender);
     }
 
-    @Test
-    public void checkIsNotEnoughMoneyOnSourceAccountCorrectly() {
-        TransferDto transferDto = new TransferDto();
-        transferDto.setBalanceBeforeChangeCurrency(BigDecimal.valueOf(1000));
+    @Test(expected = SaveNewTransferException.class)
+    public void shouldThrowExceptionWhenThereIsNotEnoughMoneyOnSourceAccountWhenCreatingTransfer() {
+        // given
+        Account stubAccount = initializeStubAccount();
+        TransferDto stubTransferDto = initializeStubTransferDto();
 
-        Account accountFrom = new Account();
-        accountFrom.setBalance(BigDecimal.valueOf(800));
-        Assert.assertFalse(transferService.isEnoughMoneyOnSourceAccount(transferDto, accountFrom));
+        // when
+        transferService.createTransfer(stubTransferDto, stubAccount);
+    }
+
+    private TransferDto initializeStubTransferDto() {
+        return TransferDto.builder()
+                .balanceBeforeChangeCurrency(BigDecimal.valueOf(100))
+                .build();
+    }
+
+    private Account initializeStubAccount() {
+        return Account.builder()
+                .numberAccount("stubNumberAccount")
+                .balance(BigDecimal.valueOf(10))
+                .currency("PLN")
+                .build();
     }
 }

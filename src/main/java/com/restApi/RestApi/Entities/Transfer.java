@@ -1,17 +1,19 @@
 package com.restApi.RestApi.Entities;
 
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
 import java.math.BigDecimal;
 
 @Entity
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "transfers")
 public class Transfer {
     @Id

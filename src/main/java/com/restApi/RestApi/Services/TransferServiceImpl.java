@@ -88,11 +88,11 @@ public class TransferServiceImpl implements TransferService {
 
             System.out.println("WYSLANO PRZELEW DO ARKA");
             if (postTransfer.getStatusCode() == HttpStatus.OK) {
+                System.out.println("STATUS OK");
                 if(transferDto.getEmail().length() > 2)
                 {
                     sendEmail(transferDto);
                 }
-                System.out.println("STATUS OK");
                 subtractMoneyFromSourceAccount(transferDto, accountFrom);
                 ExternalTransfer externalTransfer = classConverter.convertTransferDtoToExternalTransfer(transferDto, accountFrom);
                 externalTransferDao.save(externalTransfer);
@@ -114,11 +114,10 @@ public class TransferServiceImpl implements TransferService {
                 transferDto.getBalanceBeforeChangeCurrency() + "PLN" + " na numer " +
                 "konta: " + transferDto.getToNumberAccount() + ".");
         javaMailSender.send(msg);
-
     }
 
-    public boolean isEnoughMoneyOnSourceAccount(TransferDto transferDto, Account accountFrom) {
-        return accountFrom.getBalance().subtract(transferDto.getBalanceBeforeChangeCurrency()).compareTo(BigDecimal.valueOf(0)) > 0;
+    private boolean isEnoughMoneyOnSourceAccount(TransferDto transferDto, Account accountFrom) {
+        return accountFrom.getBalance().subtract(transferDto.getBalanceBeforeChangeCurrency()).compareTo(BigDecimal.valueOf(0)) >= 0;
     }
 
     private void subtractMoneyFromSourceAccount(TransferDto transferData, Account accountFrom) {
@@ -140,7 +139,7 @@ public class TransferServiceImpl implements TransferService {
         transferDao.save(transferToSave);
     }
 
-    public BigDecimal convertCurrency(String currencyFrom, String currencyTo) {
+    private BigDecimal convertCurrency(String currencyFrom, String currencyTo) {
         BigDecimal multiplyCurrency;
         RestTemplate restTemplate = new RestTemplate();
         String currencyApiUrl = "https://api.exchangeratesapi.io/latest?base=";

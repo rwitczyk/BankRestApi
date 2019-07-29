@@ -11,52 +11,52 @@ public class ClassConverter {
         List<TransferDto> transferDtos = new ArrayList<>();
         for (Transfer transfer : transfers
         ) {
-            TransferDto transferDto = new TransferDto();
-            transferDto.setId(transfer.getId());
-            transferDto.setToNumberAccount(transfer.getToAccount().getNumberAccount());
-            transferDto.setFromNumberAccount(transfer.getFromAccount().getNumberAccount());
-            transferDto.setCreateTransferDate(transfer.getCreateTransferDate());
-            transferDto.setExecuteTransferDate(transfer.getExecuteTransferDate());
-            transferDto.setStatus(transfer.getStatus());
-            transferDto.setCurrencyDestinationAccount(transfer.getCurrencyDestinationAccount());
-            transferDto.setBalanceBeforeChangeCurrency(transfer.getBalanceBeforeChangeCurrency());
-            transferDto.setBalanceAfterChangeCurrency(transfer.getBalanceAfterChangeCurrency());
+            TransferDto transferDto = TransferDto.builder()
+                    .toNumberAccount(transfer.getToAccount().getNumberAccount())
+                    .fromNumberAccount(transfer.getFromAccount().getNumberAccount())
+                    .createTransferDate(transfer.getCreateTransferDate())
+                    .executeTransferDate(transfer.getExecuteTransferDate())
+                    .status(transfer.getStatus())
+                    .currencyDestinationAccount(transfer.getCurrencyDestinationAccount())
+                    .currencyFromAccount(transfer.getCurrencyFromAccount())
+                    .balanceBeforeChangeCurrency(transfer.getBalanceBeforeChangeCurrency())
+                    .balanceAfterChangeCurrency(transfer.getBalanceAfterChangeCurrency())
+                    .build();
+
             transferDtos.add(transferDto);
         }
         return transferDtos;
     }
 
     public Transfer convertTransferDtoToTransfer(TransferDto transferData, Account accountFrom, Account accountTo) {
-        Transfer transferToSave = new Transfer();
-        transferToSave.setId(transferData.getId());
-        transferToSave.setFromAccount(accountFrom);
-        transferToSave.setToAccount(accountTo);
-        transferToSave.setStatus(transferData.getStatus());
-        transferToSave.setCurrencyDestinationAccount(transferData.getCurrencyDestinationAccount());
-        transferToSave.setBalanceBeforeChangeCurrency(transferData.getBalanceBeforeChangeCurrency());
-        transferToSave.setBalanceAfterChangeCurrency(transferData.getBalanceAfterChangeCurrency());
-        transferToSave.setCreateTransferDate(transferData.getCreateTransferDate());
-        return transferToSave;
+        return Transfer.builder()
+                .fromAccount(accountFrom)
+                .toAccount(accountTo)
+                .status(transferData.getStatus())
+                .currencyDestinationAccount(transferData.getCurrencyDestinationAccount())
+                .currencyFromAccount(transferData.getCurrencyFromAccount())
+                .balanceBeforeChangeCurrency(transferData.getBalanceBeforeChangeCurrency())
+                .balanceAfterChangeCurrency(transferData.getBalanceAfterChangeCurrency())
+                .createTransferDate(transferData.getCreateTransferDate())
+                .build();
     }
 
     public ExternalTransferDto convertTransferDtoToExternalTransferDto(TransferDto transferDto) {
-        ExternalTransferDto externalTransferDto = new ExternalTransferDto();
-        externalTransferDto.setAmount(transferDto.getBalanceBeforeChangeCurrency().toString());
-        externalTransferDto.setBankName("Robert44");
-        externalTransferDto.setCurrency("PLN");
-        externalTransferDto.setExternalAccount(transferDto.getFromNumberAccount());
-        externalTransferDto.setToAccount(transferDto.getToNumberAccount());
-
-        return externalTransferDto;
+        return ExternalTransferDto.builder()
+                .amount(transferDto.getBalanceBeforeChangeCurrency().toString())
+                .bankName("Robert44")
+                .currency("PLN")
+                .externalAccount(transferDto.getFromNumberAccount())
+                .toAccount(transferDto.getToNumberAccount())
+                .build();
     }
 
     public ExternalTransfer convertTransferDtoToExternalTransfer(TransferDto transferDto, Account accountFrom) {
-        ExternalTransfer externalTransfer = new ExternalTransfer();
-        externalTransfer.setAmount(transferDto.getBalanceBeforeChangeCurrency());
-        externalTransfer.setFromAccount(accountFrom);
-        externalTransfer.setToAccount(transferDto.getToNumberAccount());
-        externalTransfer.setCreateTransferDate(transferDto.getCreateTransferDate());
-
-        return externalTransfer;
+        return ExternalTransfer.builder()
+                .amount(transferDto.getBalanceBeforeChangeCurrency())
+                .fromAccount(accountFrom)
+                .toAccount(transferDto.getToNumberAccount())
+                .createTransferDate(transferDto.getCreateTransferDate())
+                .build();
     }
 }

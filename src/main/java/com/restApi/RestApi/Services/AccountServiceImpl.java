@@ -47,11 +47,11 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account changeNameAccountByIdAccount(int accountId, Account account) {
+    public Account changeNameAccountByIdAccount(int accountId, String newName) {
         Account accountToChange = accountDaoWithCRUD.getAccountById(accountId);
 
         if (accountToChange != null) {
-            setNewNameToAccount(accountToChange, account.getName());
+            setNewNameToAccount(accountToChange, newName);
             accountDaoWithCRUD.save(accountToChange);
             return accountToChange;
         } else {
@@ -59,8 +59,7 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
-    @Override
-    public Account setNewNameToAccount(Account accountToChange, String name) {
+    private Account setNewNameToAccount(Account accountToChange, String name) {
         accountToChange.setName(name);
 
         return accountToChange;

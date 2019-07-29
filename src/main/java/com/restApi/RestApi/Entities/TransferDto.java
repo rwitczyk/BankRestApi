@@ -1,10 +1,12 @@
 package com.restApi.RestApi.Entities;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
 
 @Data
+@Builder
 public class TransferDto {
     int id;
     BigDecimal balanceBeforeChangeCurrency;

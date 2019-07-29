@@ -50,7 +50,7 @@ public class AccountEndpoint {
 
     @PostMapping("accounts/edit/name/{idAccount}")
     public ResponseEntity<Account> editNameAccount(@RequestBody Account accountData, @PathVariable int idAccount) {
-        Account account = accountService.changeNameAccountByIdAccount(idAccount, accountData);
+        Account account = accountService.changeNameAccountByIdAccount(idAccount, accountData.getName());
         return new ResponseEntity<>(account, HttpStatus.OK);
     }
 
